@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { FlaskConical, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,16 @@ const NAV_LINKS = STACKS.map((s) => ({ to: `/${s.slug}`, label: s.slug }))
 export function Header() {
   const { user, loading } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Mobile menu: ESC ปิด
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mobileOpen])
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">

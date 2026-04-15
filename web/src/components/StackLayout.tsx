@@ -40,18 +40,38 @@ export function StackLayout({ currentStack, currentLabKey, children, toc }: Prop
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   // Keyboard shortcut: Cmd/Ctrl+B → toggle sidebar (เลียนแบบ VS Code)
+  // ข้ามถ้า user กำลังพิมพ์ใน input/textarea/contentEditable
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().includes('MAC')
       const mod = isMac ? e.metaKey : e.ctrlKey
-      if (mod && e.key === 'b') {
-        e.preventDefault()
-        setCollapsed((v) => !v)
-      }
+      if (!(mod && e.key === 'b')) return
+
+      const target = e.target as HTMLElement | null
+      const tag = target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || target?.isContentEditable) return
+
+      e.preventDefault()
+      setCollapsed((v) => !v)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [setCollapsed])
+
+  // Drawer: ESC ปิด + lock body scroll ขณะเปิด
+  useEffect(() => {
+    if (!drawerOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDrawerOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [drawerOpen])
 
   return (
     <div className="mx-auto flex w-full max-w-7xl gap-0">

@@ -98,7 +98,13 @@ export default function Register() {
         </CardHeader>
         <CardContent>
           {serverError && (
-            <Alert variant="destructive" className="mb-4">
+            <Alert
+              variant="destructive"
+              className="mb-4"
+              role="alert"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{serverError}</AlertDescription>
             </Alert>
