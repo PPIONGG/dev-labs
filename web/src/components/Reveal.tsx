@@ -13,6 +13,8 @@ interface Props {
   className?: string
   /** as element (default div) */
   as?: 'div' | 'section' | 'article' | 'li'
+  /** html id — สำหรับ anchor link / scroll-to */
+  id?: string
 }
 
 /**
@@ -27,6 +29,7 @@ export function Reveal({
   from = 'bottom',
   className,
   as: Tag = 'div',
+  id,
 }: Props) {
   const [ref, inView] = useInView<HTMLDivElement>()
   const reduced = useReducedMotion()
@@ -53,6 +56,7 @@ export function Reveal({
   return (
     <Tag
       ref={ref as never}
+      id={id}
       className={cn(
         'transition-all duration-700 ease-out will-change-[opacity,transform]',
         enterClass,
