@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, FileCode2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 const STACK_NAMES: Record<string, string> = {
   docker: 'Docker',
@@ -12,6 +13,7 @@ const STACK_NAMES: Record<string, string> = {
 export default function StackComingSoon() {
   const { stack = '' } = useParams()
   const name = STACK_NAMES[stack] ?? 'Unknown'
+  useDocumentTitle(`${name} · Dev Labs`)
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-4 text-center">

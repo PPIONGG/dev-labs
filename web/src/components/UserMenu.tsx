@@ -1,4 +1,5 @@
 import { LogOut, User as UserIcon } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import {
   Avatar,
@@ -33,6 +34,7 @@ function initials(name: string | null, email: string) {
 
 export function UserMenu() {
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   if (!user) return null
 
@@ -40,6 +42,7 @@ export function UserMenu() {
     try {
       await logout()
       toast.success('ออกจากระบบแล้ว')
+      navigate('/', { replace: true })
     } catch (err) {
       console.error('[logout]', err)
       toast.error('ออกจากระบบไม่สำเร็จ')
@@ -67,12 +70,14 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <UserIcon className="mr-2 h-4 w-4" />
-          โปรไฟล์ (เร็วๆ นี้)
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link to="/me">
+            <UserIcon className="mr-2 h-4 w-4" />
+            โปรไฟล์
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           ออกจากระบบ
         </DropdownMenuItem>

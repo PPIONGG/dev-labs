@@ -1,0 +1,270 @@
+import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
+import {
+  LogOut,
+  Mail,
+  Calendar,
+  Container,
+  Database,
+  Flame,
+  Leaf,
+  ArrowRight,
+  type LucideIcon,
+} from 'lucide-react'
+import {
+  Avatar,
+  AvatarFallback,
+} from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { useAuth } from '@/hooks/useAuth'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+
+interface StackProgress {
+  slug: string
+  name: string
+  icon: LucideIcon
+  total: number
+  done: number
+  iconClass: string
+  iconBg: string
+}
+
+// Placeholder progress — จะเชื่อมต่อกับ /api/progress ใน slice ถัดไป
+const STACK_PROGRESS: StackProgress[] = [
+  {
+    slug: 'docker',
+    name: 'Docker',
+    icon: Container,
+    total: 19,
+    done: 0,
+    iconClass: 'text-sky-600 dark:text-sky-400',
+    iconBg: 'bg-sky-500/10',
+  },
+  {
+    slug: 'postgresql',
+    name: 'PostgreSQL',
+    icon: Database,
+    total: 17,
+    done: 0,
+    iconClass: 'text-indigo-600 dark:text-indigo-400',
+    iconBg: 'bg-indigo-500/10',
+  },
+  {
+    slug: 'redis',
+    name: 'Redis',
+    icon: Flame,
+    total: 14,
+    done: 0,
+    iconClass: 'text-rose-600 dark:text-rose-400',
+    iconBg: 'bg-rose-500/10',
+  },
+  {
+    slug: 'mongodb',
+    name: 'MongoDB',
+    icon: Leaf,
+    total: 15,
+    done: 0,
+    iconClass: 'text-emerald-600 dark:text-emerald-400',
+    iconBg: 'bg-emerald-500/10',
+  },
+]
+
+function initials(name: string | null, email: string) {
+  if (name) {
+    return name
+      .split(' ')
+      .map((w) => w[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase()
+  }
+  return email.slice(0, 2).toUpperCase()
+}
+
+function formatJoinedDate(iso: string) {
+  try {
+    return new Intl.DateTimeFormat('th-TH', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(new Date(iso))
+  } catch {
+    return iso.split('T')[0]
+  }
+}
+
+export default function Profile() {
+  useDocumentTitle('โปรไฟล์ · Dev Labs')
+  const { user, logout } = useAuth()
+
+  if (!user) return null // ProtectedRoute จะ redirect ไปก่อนถึงตรงนี้
+
+  const totalLabs = STACK_PROGRESS.reduce((sum, s) => sum + s.total, 0)
+  const totalDone = STACK_PROGRESS.reduce((sum, s) => sum + s.done, 0)
+  const overallPct = totalLabs > 0 ? Math.round((totalDone / totalLabs) * 100) : 0
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      toast.success('ออกจากระบบแล้ว')
+    } catch {
+      toast.error('ออกจากระบบไม่สำเร็จ')
+    }
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
+      {/* Header card */}
+      <Card className="mb-8">
+        <CardContent className="flex flex-col items-start gap-6 p-6 sm:flex-row sm:items-center">
+          <Avatar className="h-16 w-16">
+            <AvatarFallback className="bg-primary text-base font-medium text-primary-foreground">
+              {initials(user.displayName, user.email)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              // your account
+            </div>
+            <h1 className="mt-1 font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              {user.displayName ?? 'นักเรียน'}
+            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <Mail className="h-3.5 w-3.5" aria-hidden="true" />
+                {user.email}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
+                เข้าร่วม {formatJoinedDate(user.createdAt)}
+              </span>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="cursor-pointer self-start sm:self-auto"
+          >
+            <LogOut className="h-4 w-4" aria-hidden="true" />
+            ออกจากระบบ
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Overall progress */}
+      <section className="mb-8">
+        <div className="mb-3 flex items-end justify-between">
+          <div>
+            <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              // overall progress
+            </div>
+            <h2 className="mt-1 font-display text-xl font-bold tracking-tight">
+              ความคืบหน้ารวม
+            </h2>
+          </div>
+          <div className="text-right">
+            <div className="font-display text-3xl font-bold tabular-nums">
+              {overallPct}
+              <span className="ml-0.5 text-base font-normal text-muted-foreground">
+                %
+              </span>
+            </div>
+            <div className="font-mono text-xs text-muted-foreground">
+              {totalDone} / {totalLabs} labs
+            </div>
+          </div>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full bg-[--success] transition-all"
+            style={{ width: `${overallPct}%` }}
+            role="progressbar"
+            aria-valuenow={overallPct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="ความคืบหน้ารวม"
+          />
+        </div>
+        {totalDone === 0 && (
+          <p className="mt-3 text-sm text-muted-foreground">
+            ยังไม่ได้เริ่ม lab ไหนเลย — เริ่มที่ stack แรกได้เลย ↓
+          </p>
+        )}
+      </section>
+
+      <Separator className="my-8" />
+
+      {/* Per-stack progress */}
+      <section>
+        <div className="mb-4">
+          <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            // by stack
+          </div>
+          <h2 className="mt-1 font-display text-xl font-bold tracking-tight">
+            ความคืบหน้าแยกตาม stack
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            * ตอนนี้ progress tracking ยังไม่เปิดใช้ — จะเชื่อม API ใน slice ถัดไป
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {STACK_PROGRESS.map((s) => {
+            const Icon = s.icon
+            const pct = s.total > 0 ? Math.round((s.done / s.total) * 100) : 0
+            return (
+              <Link
+                key={s.slug}
+                to={`/${s.slug}`}
+                className="group cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                <Card className="transition-colors hover:border-foreground/30">
+                  <CardHeader className="flex-row items-start gap-4 space-y-0 pb-3">
+                    <div
+                      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${s.iconBg}`}
+                      aria-hidden="true"
+                    >
+                      <Icon className={`h-5 w-5 ${s.iconClass}`} />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="flex items-center justify-between font-display text-base tracking-tight">
+                        {s.name}
+                        <ArrowRight
+                          className="h-4 w-4 translate-x-0 opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100"
+                          aria-hidden="true"
+                        />
+                      </CardTitle>
+                      <CardDescription className="font-mono text-xs">
+                        {s.done} / {s.total} labs · {pct}%
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full bg-[--success] transition-all"
+                        style={{ width: `${pct}%` }}
+                        role="progressbar"
+                        aria-valuenow={pct}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-label={`${s.name} progress`}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
+          })}
+        </div>
+      </section>
+    </div>
+  )
+}

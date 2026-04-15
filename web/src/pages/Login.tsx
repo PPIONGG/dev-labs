@@ -24,8 +24,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { PasswordInput } from '@/components/PasswordInput'
 import { useAuth } from '@/hooks/useAuth'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { ApiError } from '@/lib/api'
+import { safeRedirect } from '@/lib/utils'
 
 const loginSchema = z.object({
   email: z.string().min(1, 'กรุณากรอกอีเมล').email('อีเมลไม่ถูกต้อง'),
@@ -35,6 +38,7 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>
 
 export default function Login() {
+  useDocumentTitle('เข้าสู่ระบบ · Dev Labs')
   const { user, loading, login } = useAuth()
   const [searchParams] = useSearchParams()
   const [serverError, setServerError] = useState<string | null>(null)
@@ -53,7 +57,7 @@ export default function Login() {
   }
 
   if (user) {
-    const next = searchParams.get('next') ?? '/'
+    const next = safeRedirect(searchParams.get('next'))
     return <Navigate to={next} replace />
   }
 
@@ -118,9 +122,18 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>รหัสผ่าน</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>รหัสผ่าน</FormLabel>
+                      <button
+                        type="button"
+                        onClick={() => toast.info('ฟีเจอร์ลืมรหัสผ่านยังไม่เปิดใช้')}
+                        className="cursor-pointer font-mono text-[11px] text-muted-foreground hover:text-foreground hover:underline"
+                      >
+                        ลืมรหัสผ่าน?
+                      </button>
+                    </div>
                     <FormControl>
-                      <Input type="password" autoComplete="current-password" {...field} />
+                      <PasswordInput autoComplete="current-password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

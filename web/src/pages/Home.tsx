@@ -31,6 +31,7 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { TerminalMock } from '@/components/TerminalMock'
 import { useAuth } from '@/hooks/useAuth'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 interface Stack {
   slug: string
@@ -197,6 +198,7 @@ const ROADMAP: RoadmapItem[] = [
 const TOTAL_LABS = STACKS.reduce((sum, s) => sum + s.labCount, 0)
 
 export default function Home() {
+  useDocumentTitle('Dev Labs · ฝึก Dev Skills ด้วยของจริง')
   const { user } = useAuth()
   const greeting = user?.displayName ?? user?.email ?? null
 
@@ -262,10 +264,11 @@ export default function Home() {
                 <Input
                   id="lab-search"
                   type="search"
-                  placeholder="ค้นหา lab เช่น docker, index, pub/sub…"
+                  placeholder="กรอง stacks เช่น docker, redis…"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="h-11 pl-9 pr-3 font-mono text-sm"
+                  aria-label="กรอง learning paths"
                 />
               </div>
             </div>
@@ -280,15 +283,18 @@ export default function Home() {
                   </Link>
                 </Button>
               )}
-              <Button size="lg" variant="outline" asChild className="cursor-pointer">
-                <a
-                  href="https://github.com/thammasornlueadtaharn/dev-labs"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  <Terminal className="h-4 w-4" aria-hidden="true" />
-                  ดู labs บน GitHub
-                </a>
+              <Button
+                size="lg"
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() =>
+                  document
+                    .getElementById('roadmap')
+                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+              >
+                <Terminal className="h-4 w-4" aria-hidden="true" />
+                ดู roadmap
               </Button>
             </div>
 
@@ -434,7 +440,7 @@ export default function Home() {
         </section>
 
         {/* Roadmap — honest about what's here now vs coming */}
-        <section className="mt-20">
+        <section id="roadmap" className="mt-20 scroll-mt-20">
           <div className="mb-8 max-w-2xl">
             <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
               // roadmap

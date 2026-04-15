@@ -25,7 +25,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { PasswordInput } from '@/components/PasswordInput'
 import { useAuth } from '@/hooks/useAuth'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { ApiError } from '@/lib/api'
 
 const registerSchema = z.object({
@@ -40,6 +42,7 @@ const registerSchema = z.object({
 type RegisterValues = z.infer<typeof registerSchema>
 
 export default function Register() {
+  useDocumentTitle('สมัครสมาชิก · Dev Labs')
   const { user, loading, register } = useAuth()
   const [serverError, setServerError] = useState<string | null>(null)
 
@@ -144,7 +147,7 @@ export default function Register() {
                   <FormItem>
                     <FormLabel>รหัสผ่าน</FormLabel>
                     <FormControl>
-                      <Input type="password" autoComplete="new-password" {...field} />
+                      <PasswordInput autoComplete="new-password" {...field} />
                     </FormControl>
                     <FormDescription>อย่างน้อย 8 ตัว</FormDescription>
                     <FormMessage />

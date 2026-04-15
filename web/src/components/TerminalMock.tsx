@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 /**
  * Fake terminal session — แสดงในหน้า hero เพื่อให้รู้สึก developer-focused
  * พิมพ์ทีละบรรทัดด้วย stagger delay สำหรับเอฟเฟกต์สมจริง
+ *
+ * เคารพ `prefers-reduced-motion` — แสดงทุกบรรทัดทันทีถ้า user ไม่ต้องการ animation
  */
 const LINES = [
   { type: 'prompt', text: 'docker compose up -d' },
@@ -19,13 +22,18 @@ const LINES = [
 ] as const
 
 export function TerminalMock() {
-  const [visibleLines, setVisibleLines] = useState(0)
+  const reducedMotion = useReducedMotion()
+  const [visibleLines, setVisibleLines] = useState(reducedMotion ? LINES.length : 0)
 
   useEffect(() => {
+    if (reducedMotion) {
+      setVisibleLines(LINES.length)
+      return
+    }
     if (visibleLines >= LINES.length) return
     const t = setTimeout(() => setVisibleLines((n) => n + 1), 350)
     return () => clearTimeout(t)
-  }, [visibleLines])
+  }, [visibleLines, reducedMotion])
 
   return (
     <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-[0_8px_32px_-12px] shadow-foreground/10 ring-1 ring-border/50">

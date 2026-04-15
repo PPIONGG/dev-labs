@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { ArrowLeft, FileQuestion } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 export default function NotFound() {
+  useDocumentTitle('404 · Dev Labs')
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-4 text-center">
       <div
