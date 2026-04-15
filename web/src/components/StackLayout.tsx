@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from 'react'
-import { Menu, X } from 'lucide-react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Menu, X, PanelLeftClose, PanelLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StackSidebar } from '@/components/StackSidebar'
 import { useContentIndex } from '@/hooks/useContent'
+import { useLocalStorageState } from '@/hooks/useLocalStorageState'
 import type { StackSlug } from '@/lib/content'
 import { cn } from '@/lib/utils'
 
@@ -21,35 +22,61 @@ interface Props {
 /**
  * Layout สำหรับหน้า /:stack และ /:stack/:lab
  *
- * Desktop: 2-3 columns
+ * Desktop: 2-3 columns (sidebar collapsible)
  *   ┌─────────┬───────────────┬───────┐
  *   │ Sidebar │ Content       │  TOC  │
  *   └─────────┴───────────────┴───────┘
  *
  * Mobile: sidebar เป็น drawer (toggle ผ่านปุ่ม "Lab list")
+ *
+ * Keyboard shortcut: `[` หรือ `Ctrl/Cmd+B` toggle sidebar (เหมือน VS Code)
  */
 export function StackLayout({ currentStack, currentLabKey, children, toc }: Props) {
   const { data: index, loading, error } = useContentIndex()
+  const [collapsed, setCollapsed] = useLocalStorageState(
+    'dev-labs-sidebar-collapsed',
+    false,
+  )
   const [drawerOpen, setDrawerOpen] = useState(false)
+
+  // Keyboard shortcut: Cmd/Ctrl+B → toggle sidebar (เลียนแบบ VS Code)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const isMac = navigator.platform.toUpperCase().includes('MAC')
+      const mod = isMac ? e.metaKey : e.ctrlKey
+      if (mod && e.key === 'b') {
+        e.preventDefault()
+        setCollapsed((v) => !v)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [setCollapsed])
 
   return (
     <div className="mx-auto flex w-full max-w-7xl gap-0">
-      {/* Sidebar — desktop sticky (self-start ป้องกัน flex stretch ไม่ให้ sticky พัง) */}
+      {/* Sidebar — desktop sticky + collapsible */}
       <aside
-        className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 self-start overflow-y-auto border-r border-border/60 bg-background/40 lg:block"
+        className={cn(
+          'sticky top-14 hidden h-[calc(100vh-3.5rem)] shrink-0 self-start overflow-hidden border-r border-border/60 bg-background/40 transition-[width] duration-200 ease-out lg:block',
+          collapsed ? 'w-0 border-r-0' : 'w-64',
+        )}
         aria-label="Sidebar navigation"
+        aria-hidden={collapsed}
       >
-        {loading ? (
-          <SidebarSkeleton />
-        ) : error ? (
-          <SidebarError message={error.message} />
-        ) : index ? (
-          <StackSidebar
-            index={index}
-            currentStack={currentStack}
-            currentLabKey={currentLabKey}
-          />
-        ) : null}
+        <div className={cn('h-full overflow-y-auto', collapsed && 'invisible')}>
+          {loading ? (
+            <SidebarSkeleton />
+          ) : error ? (
+            <SidebarError message={error.message} />
+          ) : index ? (
+            <StackSidebar
+              index={index}
+              currentStack={currentStack}
+              currentLabKey={currentLabKey}
+            />
+          ) : null}
+        </div>
       </aside>
 
       {/* Mobile drawer toggle button — fixed bottom-right */}
@@ -104,6 +131,22 @@ export function StackLayout({ currentStack, currentLabKey, children, toc }: Prop
       {/* Main content */}
       <div className={cn('flex-1 min-w-0', toc ? 'xl:flex xl:gap-8' : '')}>
         <div className={cn('px-4 py-8 sm:px-8', toc ? 'xl:flex-1 xl:min-w-0' : '')}>
+          {/* Sidebar collapse toggle — desktop only, top of content */}
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            onClick={() => setCollapsed((v) => !v)}
+            className="mb-4 hidden cursor-pointer text-muted-foreground hover:text-foreground lg:inline-flex"
+            aria-label={collapsed ? 'แสดง sidebar' : 'ซ่อน sidebar'}
+            aria-pressed={collapsed}
+            title={`${collapsed ? 'แสดง' : 'ซ่อน'} sidebar (${navigator.platform.toUpperCase().includes('MAC') ? '⌘' : 'Ctrl'}+B)`}
+          >
+            {collapsed ? (
+              <PanelLeft className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+            )}
+          </Button>
           {children}
         </div>
 
