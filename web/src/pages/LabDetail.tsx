@@ -253,7 +253,7 @@ function TocPanel({ markdown }: { markdown: string }) {
                 item.level === 3 && 'pl-5',
                 item.level === 2 && 'pl-3',
                 activeId === item.id
-                  ? 'border-[--success] text-foreground'
+                  ? 'border-(--success) text-foreground'
                   : 'border-transparent text-muted-foreground hover:text-foreground',
               )}
             >

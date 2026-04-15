@@ -110,7 +110,7 @@ export function StackSidebar({
                       >
                         {completed ? (
                           <CheckCircle2
-                            className="mt-0.5 h-3 w-3 shrink-0 text-[--success]"
+                            className="mt-0.5 h-3 w-3 shrink-0 text-(--success)"
                             aria-label="ทำเสร็จแล้ว"
                           />
                         ) : (

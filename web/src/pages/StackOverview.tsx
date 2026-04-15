@@ -90,7 +90,7 @@ function StackOverviewInner({
         <p className="mt-2 font-mono text-xs text-muted-foreground">
           {doneCount > 0 ? (
             <>
-              ทำเสร็จ <span className="text-[--success]">{doneCount}</span> /{' '}
+              ทำเสร็จ <span className="text-(--success)">{doneCount}</span> /{' '}
               {stack.labs.length} labs ({Math.round((doneCount / stack.labs.length) * 100)}
               %)
             </>
@@ -118,7 +118,7 @@ function StackOverviewInner({
                 <Card
                   className={cn(
                     'h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm',
-                    completed && 'border-[--success]/40 bg-[--success]/5',
+                    completed && 'border-(--success)/40 bg-(--success)/5',
                   )}
                 >
                   <CardHeader className="pb-3">
@@ -127,7 +127,7 @@ function StackOverviewInner({
                         className={cn(
                           'mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md font-mono text-[11px] tabular-nums',
                           completed
-                            ? 'bg-[--success] text-[--success-foreground]'
+                            ? 'bg-(--success) text-(--success-foreground)'
                             : 'bg-muted text-muted-foreground',
                         )}
                       >
@@ -156,7 +156,7 @@ function StackOverviewInner({
                   <CardContent
                     className={cn(
                       'flex items-center gap-1.5 pt-0 font-mono text-[11px]',
-                      completed ? 'text-[--success]' : 'text-muted-foreground',
+                      completed ? 'text-(--success)' : 'text-muted-foreground',
                     )}
                   >
                     <BookOpen className="h-3 w-3" aria-hidden="true" />

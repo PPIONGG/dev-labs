@@ -30,7 +30,7 @@ export function Header() {
           className="group flex shrink-0 cursor-pointer items-center gap-2 font-display text-[15px] font-semibold tracking-tight transition-colors hover:text-foreground/80"
         >
           <FlaskConical
-            className="h-4 w-4 text-[--success] transition-transform duration-200 group-hover:rotate-12"
+            className="h-4 w-4 text-(--success) transition-transform duration-200 group-hover:rotate-12"
             aria-hidden="true"
           />
           <span>dev-labs</span>

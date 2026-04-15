@@ -19,7 +19,7 @@ export function Footer() {
             to="/"
             className="flex cursor-pointer items-center gap-2 font-display text-sm font-semibold tracking-tight transition-opacity hover:opacity-80"
           >
-            <FlaskConical className="h-4 w-4 text-[--success]" aria-hidden="true" />
+            <FlaskConical className="h-4 w-4 text-(--success)" aria-hidden="true" />
             <span>dev-labs</span>
             <span className="ml-1 font-mono text-xs font-normal text-muted-foreground">
               v0.1 · slice-0

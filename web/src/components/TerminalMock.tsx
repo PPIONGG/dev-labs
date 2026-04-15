@@ -55,7 +55,7 @@ export function TerminalMock() {
           <div key={i} className="whitespace-pre">
             {line.type === 'prompt' && (
               <>
-                <span className="text-[--success]">$</span>{' '}
+                <span className="text-(--success)">$</span>{' '}
                 <span className="text-foreground">{line.text}</span>
               </>
             )}

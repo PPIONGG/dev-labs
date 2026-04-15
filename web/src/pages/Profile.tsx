@@ -254,7 +254,7 @@ function ProgressBar({
   return (
     <div className={`overflow-hidden rounded-full bg-muted ${height}`}>
       <div
-        className="h-full rounded-full bg-[--success] transition-[width] duration-700 ease-out"
+        className="h-full rounded-full bg-(--success) transition-[width] duration-700 ease-out"
         style={{ width: `${width}%` }}
         role="progressbar"
         aria-valuenow={value}

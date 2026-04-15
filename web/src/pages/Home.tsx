@@ -165,8 +165,8 @@ export default function Home() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full border bg-background/60 px-3 py-1 font-mono text-xs font-medium text-muted-foreground backdrop-blur">
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[--success] opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[--success]" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--success) opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-(--success)" />
               </span>
               <span>
                 online · {totalLabs || '—'} labs · {STACKS.length} stacks
@@ -277,9 +277,9 @@ export default function Home() {
               return (
                 <Reveal key={f.title} delay={i * 100}>
                   <SpotlightCard className="h-full rounded-xl border bg-card p-5 transition-colors hover:border-foreground/30">
-                    <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[--success]/10 ring-1 ring-[--success]/20">
+                    <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-(--success)/10 ring-1 ring-(--success)/20">
                       <Icon
-                        className="h-4.5 w-4.5 text-[--success]"
+                        className="h-4.5 w-4.5 text-(--success)"
                         aria-hidden="true"
                       />
                     </div>
@@ -382,7 +382,7 @@ export default function Home() {
             className="mt-20 overflow-hidden rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-8 text-center sm:p-12"
           >
             <Rocket
-              className="mx-auto mb-4 h-10 w-10 text-[--success]"
+              className="mx-auto mb-4 h-10 w-10 text-(--success)"
               aria-hidden="true"
             />
             <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
@@ -413,7 +413,7 @@ function StatusBadge({ status }: { status: RoadmapItem['status'] }) {
   const map = {
     available: {
       label: 'พร้อมใช้',
-      className: 'bg-[--success]/10 text-[--success] ring-[--success]/30',
+      className: 'bg-(--success)/10 text-(--success) ring-(--success)/30',
     },
     next: {
       label: 'เร็วๆ นี้',
@@ -431,8 +431,8 @@ function StatusBadge({ status }: { status: RoadmapItem['status'] }) {
     >
       {status === 'available' && (
         <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[--success] opacity-75 motion-reduce:hidden" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[--success]" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-(--success) opacity-75 motion-reduce:hidden" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-(--success)" />
         </span>
       )}
       {label}
@@ -477,7 +477,7 @@ function StackCard({ stack, labCount }: { stack: StackMeta; labCount: number }) 
           <CardContent className="pt-0">
             <div className="flex items-center justify-between border-t pt-3 font-mono text-xs text-muted-foreground">
               <span>{labCount} labs</span>
-              <span className="text-[--success]">→ เริ่มเรียน</span>
+              <span className="text-(--success)">→ เริ่มเรียน</span>
             </div>
           </CardContent>
         </Card>
@@ -539,7 +539,7 @@ function StepCard({ step, index }: { step: (typeof STEPS)[number]; index: number
           {stepLabel || '\u00A0'}
         </div>
         <div className="mb-4 rounded-lg bg-muted/60 p-3 font-mono text-xs ring-1 ring-border">
-          <span className="text-[--success]">$</span>{' '}
+          <span className="text-(--success)">$</span>{' '}
           <span className="text-foreground">{step.cmd}</span>
         </div>
         <h3 className="font-display text-lg font-semibold tracking-tight">
@@ -564,14 +564,14 @@ function RoadmapCard({ item, index }: { item: RoadmapItem; index: number }) {
         <div
           className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ring-1 ${
             item.status === 'available'
-              ? 'bg-[--success]/10 ring-[--success]/30'
+              ? 'bg-(--success)/10 ring-(--success)/30'
               : 'bg-muted ring-border'
           }`}
           aria-hidden="true"
         >
           <Icon
             className={`h-4.5 w-4.5 ${
-              item.status === 'available' ? 'text-[--success]' : 'text-muted-foreground'
+              item.status === 'available' ? 'text-(--success)' : 'text-muted-foreground'
             }`}
           />
         </div>
