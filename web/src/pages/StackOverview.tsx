@@ -12,14 +12,9 @@ import { StackLayout } from '@/components/StackLayout'
 import { useProgress } from '@/components/ProgressProvider'
 import { useContentIndex } from '@/hooks/useContent'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { findStack, type StackSlug } from '@/lib/content'
+import { findStack } from '@/lib/content'
+import { isStackSlug, type StackSlug } from '@/lib/stacks'
 import { cn } from '@/lib/utils'
-
-const STACK_SLUGS: StackSlug[] = ['docker', 'postgresql', 'redis', 'mongodb']
-
-function isStackSlug(value: string): value is StackSlug {
-  return (STACK_SLUGS as string[]).includes(value)
-}
 
 /**
  * Stack overview — แสดงรายการ labs ทั้งหมดของ stack

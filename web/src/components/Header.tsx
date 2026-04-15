@@ -7,14 +7,10 @@ import { Separator } from '@/components/ui/separator'
 import { ModeToggle } from '@/components/ModeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import { useAuth } from '@/hooks/useAuth'
+import { STACKS } from '@/lib/stacks'
 import { cn } from '@/lib/utils'
 
-const NAV_LINKS = [
-  { to: '/docker', label: 'docker' },
-  { to: '/postgresql', label: 'postgresql' },
-  { to: '/redis', label: 'redis' },
-  { to: '/mongodb', label: 'mongodb' },
-] as const
+const NAV_LINKS = STACKS.map((s) => ({ to: `/${s.slug}`, label: s.slug }))
 
 /**
  * Top navigation — Swiss minimal: mono brand + compact controls

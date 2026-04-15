@@ -4,10 +4,6 @@ import {
   LogOut,
   Mail,
   Calendar,
-  Container,
-  Database,
-  Flame,
-  Leaf,
   ArrowRight,
   type LucideIcon,
 } from 'lucide-react'
@@ -30,6 +26,7 @@ import { useEffect, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useProgress } from '@/components/ProgressProvider'
 import { useContentIndex } from '@/hooks/useContent'
+import { findStackMeta, TINT } from '@/lib/stacks'
 
 interface StackProgress {
   slug: string
@@ -39,33 +36,6 @@ interface StackProgress {
   done: number
   iconClass: string
   iconBg: string
-}
-
-/** Static metadata per stack (icon + colors) — รวมกับ progress runtime */
-const STACK_META: Record<
-  string,
-  { icon: LucideIcon; iconClass: string; iconBg: string }
-> = {
-  docker: {
-    icon: Container,
-    iconClass: 'text-sky-600 dark:text-sky-400',
-    iconBg: 'bg-sky-500/10',
-  },
-  postgresql: {
-    icon: Database,
-    iconClass: 'text-indigo-600 dark:text-indigo-400',
-    iconBg: 'bg-indigo-500/10',
-  },
-  redis: {
-    icon: Flame,
-    iconClass: 'text-rose-600 dark:text-rose-400',
-    iconBg: 'bg-rose-500/10',
-  },
-  mongodb: {
-    icon: Leaf,
-    iconClass: 'text-emerald-600 dark:text-emerald-400',
-    iconBg: 'bg-emerald-500/10',
-  },
 }
 
 function initials(name: string | null, email: string) {
@@ -102,13 +72,14 @@ export default function Profile() {
 
   // Derive progress per stack จาก content index + done set
   const stackProgress: StackProgress[] = (contentIndex?.stacks ?? []).map((s) => {
-    const meta = STACK_META[s.slug] ?? STACK_META.docker
+    const meta = findStackMeta(s.slug) ?? findStackMeta('docker')!
+    const tint = TINT[meta.tint]
     return {
       slug: s.slug,
       name: s.name,
       icon: meta.icon,
-      iconClass: meta.iconClass,
-      iconBg: meta.iconBg,
+      iconClass: tint.icon,
+      iconBg: tint.bg,
       total: s.labs.length,
       done: s.labs.filter((l) => isDone(l.slug)).length,
     }

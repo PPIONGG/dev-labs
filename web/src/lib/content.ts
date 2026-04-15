@@ -4,6 +4,9 @@
  * - Index loaded synchronously จาก `public/content/index.json` ตอน build
  * - Lab markdown fetch ตอน runtime (cached ใน Map)
  */
+import type { StackSlug } from '@/lib/stacks'
+
+export type { StackSlug } // re-export เพื่อความเข้ากันได้กับโค้ดเดิม
 
 export interface Lab {
   slug: string // "docker/lab-01-what-is-docker"
@@ -14,8 +17,6 @@ export interface Lab {
   description?: string
   path: string // "/content/labs/docker__lab-01-what-is-docker.md"
 }
-
-export type StackSlug = 'docker' | 'postgresql' | 'redis' | 'mongodb'
 
 export interface StackInfo {
   slug: StackSlug

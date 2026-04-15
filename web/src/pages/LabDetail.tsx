@@ -10,14 +10,9 @@ import { useContentIndex, useLabMarkdown } from '@/hooks/useContent'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useAuth } from '@/hooks/useAuth'
 import { useProgress } from '@/components/ProgressProvider'
-import { findLab, findSiblings, type StackSlug } from '@/lib/content'
+import { findLab, findSiblings } from '@/lib/content'
+import { isStackSlug, type StackSlug } from '@/lib/stacks'
 import { cn } from '@/lib/utils'
-
-const STACK_SLUGS: StackSlug[] = ['docker', 'postgresql', 'redis', 'mongodb']
-
-function isStackSlug(value: string): value is StackSlug {
-  return (STACK_SLUGS as string[]).includes(value)
-}
 
 interface TocItem {
   id: string

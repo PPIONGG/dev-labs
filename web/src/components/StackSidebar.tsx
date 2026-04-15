@@ -1,16 +1,9 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import {
-  Container,
-  Database,
-  Flame,
-  Leaf,
-  ChevronRight,
-  CheckCircle2,
-  type LucideIcon,
-} from 'lucide-react'
+import { ChevronRight, CheckCircle2 } from 'lucide-react'
 import { useProgress } from '@/components/ProgressProvider'
-import type { ContentIndex, StackSlug } from '@/lib/content'
+import type { ContentIndex } from '@/lib/content'
+import { findStackMeta, TINT, type StackSlug } from '@/lib/stacks'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -21,20 +14,6 @@ interface Props {
   currentLabKey?: string
   /** เรียกตอนคลิกลิงก์ใน mobile drawer (เพื่อปิด drawer) */
   onNavigate?: () => void
-}
-
-const STACK_ICONS: Record<StackSlug, LucideIcon> = {
-  docker: Container,
-  postgresql: Database,
-  redis: Flame,
-  mongodb: Leaf,
-}
-
-const STACK_TINTS: Record<StackSlug, string> = {
-  docker: 'text-sky-600 dark:text-sky-400',
-  postgresql: 'text-indigo-600 dark:text-indigo-400',
-  redis: 'text-rose-600 dark:text-rose-400',
-  mongodb: 'text-emerald-600 dark:text-emerald-400',
 }
 
 /**
@@ -66,7 +45,9 @@ export function StackSidebar({
   return (
     <nav className="flex flex-col gap-1 py-4" aria-label="Lab navigation">
       {index.stacks.map((stack) => {
-        const Icon = STACK_ICONS[stack.slug]
+        const meta = findStackMeta(stack.slug)
+        const Icon = meta?.icon
+        const tintClass = meta ? TINT[meta.tint].icon : ''
         const isOpen = openMap[stack.slug]
         const isCurrent = stack.slug === currentStack
         const doneCount = stack.labs.filter((l) => isDone(l.slug)).length
@@ -93,10 +74,12 @@ export function StackSidebar({
                 )}
                 aria-hidden="true"
               />
-              <Icon
-                className={cn('h-3.5 w-3.5 shrink-0', STACK_TINTS[stack.slug])}
-                aria-hidden="true"
-              />
+              {Icon && (
+                <Icon
+                  className={cn('h-3.5 w-3.5 shrink-0', tintClass)}
+                  aria-hidden="true"
+                />
+              )}
               <span className="font-mono text-xs uppercase tracking-wider">
                 {stack.slug}
               </span>

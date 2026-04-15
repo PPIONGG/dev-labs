@@ -1,15 +1,13 @@
 import { Link, NavLink } from 'react-router-dom'
 import { FlaskConical } from 'lucide-react'
+import { STACKS } from '@/lib/stacks'
 import { cn } from '@/lib/utils'
 
 const YEAR = new Date().getFullYear()
 
 const FOOTER_LINKS: { to: string; label: string; end?: boolean }[] = [
   { to: '/', label: 'home', end: true },
-  { to: '/docker', label: 'docker' },
-  { to: '/postgresql', label: 'postgresql' },
-  { to: '/redis', label: 'redis' },
-  { to: '/mongodb', label: 'mongodb' },
+  ...STACKS.map((s) => ({ to: `/${s.slug}`, label: s.slug })),
 ]
 
 export function Footer() {

@@ -1,10 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Container,
   Database,
-  Flame,
-  Leaf,
   Search,
   ArrowRight,
   Terminal,
@@ -33,82 +30,12 @@ import { TerminalMock } from '@/components/TerminalMock'
 import { Reveal } from '@/components/Reveal'
 import { SpotlightCard } from '@/components/SpotlightCard'
 import { useAuth } from '@/hooks/useAuth'
+import { useContentIndex } from '@/hooks/useContent'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useInView } from '@/hooks/useInView'
 import { useCountUp } from '@/hooks/useCountUp'
 import { useTypewriter } from '@/hooks/useTypewriter'
-
-interface Stack {
-  slug: string
-  name: string
-  level: 'เริ่มต้น' | 'ปานกลาง' | 'ขั้นสูง'
-  description: string
-  labCount: number
-  icon: LucideIcon
-  tint: string
-}
-
-const STACKS: Stack[] = [
-  {
-    slug: 'docker',
-    name: 'Docker',
-    level: 'เริ่มต้น',
-    description: 'Container, Compose, Kubernetes, CI/CD',
-    labCount: 19,
-    icon: Container,
-    tint: 'sky',
-  },
-  {
-    slug: 'postgresql',
-    name: 'PostgreSQL',
-    level: 'ปานกลาง',
-    description: 'SQL, Indexing, Transactions, Performance',
-    labCount: 17,
-    icon: Database,
-    tint: 'indigo',
-  },
-  {
-    slug: 'redis',
-    name: 'Redis',
-    level: 'ปานกลาง',
-    description: 'In-memory, Caching, Pub/Sub, Streams',
-    labCount: 14,
-    icon: Flame,
-    tint: 'rose',
-  },
-  {
-    slug: 'mongodb',
-    name: 'MongoDB',
-    level: 'ขั้นสูง',
-    description: 'NoSQL, Schema design, Aggregation',
-    labCount: 15,
-    icon: Leaf,
-    tint: 'emerald',
-  },
-]
-
-const TINT: Record<string, { icon: string; bg: string; ring: string }> = {
-  sky: {
-    icon: 'text-sky-600 dark:text-sky-400',
-    bg: 'bg-sky-500/10',
-    ring: 'ring-sky-500/20',
-  },
-  indigo: {
-    icon: 'text-indigo-600 dark:text-indigo-400',
-    bg: 'bg-indigo-500/10',
-    ring: 'ring-indigo-500/20',
-  },
-  rose: {
-    icon: 'text-rose-600 dark:text-rose-400',
-    bg: 'bg-rose-500/10',
-    ring: 'ring-rose-500/20',
-  },
-  emerald: {
-    icon: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-500/10',
-    ring: 'ring-emerald-500/20',
-  },
-}
+import { STACKS, TINT, type StackMeta } from '@/lib/stacks'
 
 interface Feature {
   icon: LucideIcon
@@ -200,12 +127,18 @@ const ROADMAP: RoadmapItem[] = [
   },
 ]
 
-const TOTAL_LABS = STACKS.reduce((sum, s) => sum + s.labCount, 0)
-
 export default function Home() {
   useDocumentTitle('Dev Labs · ฝึก Dev Skills ด้วยของจริง')
   const { user } = useAuth()
+  const { data: index } = useContentIndex()
   const greeting = user?.displayName ?? user?.email ?? null
+
+  // ดึงจำนวน lab ต่อ stack จาก content index (single source of truth)
+  const labCountMap = useMemo<Record<string, number>>(() => {
+    if (!index) return {}
+    return Object.fromEntries(index.stacks.map((s) => [s.slug, s.labs.length]))
+  }, [index])
+  const totalLabs = index?.totalLabs ?? 0
 
   const [query, setQuery] = useState('')
   const filteredStacks = useMemo(() => {
@@ -235,7 +168,9 @@ export default function Home() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[--success] opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[--success]" />
               </span>
-              <span>online · {TOTAL_LABS} labs · 4 stacks</span>
+              <span>
+                online · {totalLabs || '—'} labs · {STACKS.length} stacks
+              </span>
             </div>
 
             <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tighter sm:text-5xl lg:text-6xl">
@@ -248,7 +183,9 @@ export default function Home() {
 
             <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
               คลังฝึก developer แบบ hands-on — เริ่มจาก{' '}
-              <span className="font-medium text-foreground">65 labs backend</span>{' '}
+              <span className="font-medium text-foreground">
+                {totalLabs || '—'} labs backend
+              </span>{' '}
               (Docker, PostgreSQL, Redis, MongoDB) ที่รันใน container จริง
               <br className="hidden sm:block" />
               จะขยายไปทาง <span className="font-medium text-foreground">Frontend</span>,{' '}
@@ -318,7 +255,7 @@ export default function Home() {
 
         {/* Stats strip — animated counter on scroll */}
         <Reveal as="section" className="mb-20">
-          <StatsStrip />
+          <StatsStrip totalLabs={totalLabs} />
         </Reveal>
 
         {/* Features section */}
@@ -405,7 +342,7 @@ export default function Home() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {filteredStacks.map((stack, i) => (
                 <Reveal key={stack.slug} delay={i * 80}>
-                  <StackCard stack={stack} />
+                  <StackCard stack={stack} labCount={labCountMap[stack.slug] ?? 0} />
                 </Reveal>
               ))}
             </div>
@@ -503,14 +440,14 @@ function StatusBadge({ status }: { status: RoadmapItem['status'] }) {
   )
 }
 
-function StackCard({ stack }: { stack: Stack }) {
+function StackCard({ stack, labCount }: { stack: StackMeta; labCount: number }) {
   const Icon = stack.icon
   const t = TINT[stack.tint]
   return (
     <Link
       to={`/${stack.slug}`}
       className="group cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      aria-label={`เริ่มเรียน ${stack.name} — ${stack.labCount} labs`}
+      aria-label={`เริ่มเรียน ${stack.name} — ${labCount} labs`}
     >
       <SpotlightCard className="h-full">
         <Card className="h-full bg-transparent transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-md">
@@ -539,7 +476,7 @@ function StackCard({ stack }: { stack: Stack }) {
           </CardHeader>
           <CardContent className="pt-0">
             <div className="flex items-center justify-between border-t pt-3 font-mono text-xs text-muted-foreground">
-              <span>{stack.labCount} labs</span>
+              <span>{labCount} labs</span>
               <span className="text-[--success]">→ เริ่มเรียน</span>
             </div>
           </CardContent>
@@ -552,9 +489,9 @@ function StackCard({ stack }: { stack: Stack }) {
 /**
  * Stats strip — animate counter from 0 → target เมื่อเข้ามาใน viewport
  */
-function StatsStrip() {
+function StatsStrip({ totalLabs }: { totalLabs: number }) {
   const [ref, inView] = useInView<HTMLDivElement>()
-  const labs = useCountUp({ start: inView, end: TOTAL_LABS, duration: 1400 })
+  const labs = useCountUp({ start: inView, end: totalLabs, duration: 1400 })
   const stacks = useCountUp({ start: inView, end: STACKS.length, duration: 1000 })
   const handsOn = useCountUp({ start: inView, end: 100, duration: 1500 })
   // ราคา: ใช้ string เลย ไม่ animate
