@@ -30,8 +30,13 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { TerminalMock } from '@/components/TerminalMock'
+import { Reveal } from '@/components/Reveal'
+import { SpotlightCard } from '@/components/SpotlightCard'
 import { useAuth } from '@/hooks/useAuth'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useInView } from '@/hooks/useInView'
+import { useCountUp } from '@/hooks/useCountUp'
+import { useTypewriter } from '@/hooks/useTypewriter'
 
 interface Stack {
   slug: string
@@ -311,30 +316,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Stats strip */}
-        <section
-          aria-label="Statistics"
-          className="mb-20 grid grid-cols-2 gap-6 rounded-xl border bg-muted/30 p-6 sm:grid-cols-4 sm:p-8"
-        >
-          {[
-            { value: '65', label: 'labs' },
-            { value: '4', label: 'stacks' },
-            { value: '100%', label: 'hands-on' },
-            { value: '0฿', label: 'ใช้ฟรี' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="font-display text-3xl font-bold tracking-tighter sm:text-4xl">
-                {stat.value}
-              </div>
-              <div className="mt-1 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                {stat.label}
-              </div>
-            </div>
-          ))}
-        </section>
+        {/* Stats strip — animated counter on scroll */}
+        <Reveal as="section" className="mb-20">
+          <StatsStrip />
+        </Reveal>
 
         {/* Features section */}
-        <section className="mb-20">
+        <Reveal as="section" className="mb-20">
           <div className="mb-8 max-w-2xl">
             <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
               // why dev-labs
@@ -347,33 +335,30 @@ export default function Home() {
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((f) => {
+            {FEATURES.map((f, i) => {
               const Icon = f.icon
               return (
-                <div
-                  key={f.title}
-                  className="group rounded-xl border bg-card p-5 transition-colors hover:border-foreground/30"
-                >
-                  <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[--success]/10 ring-1 ring-[--success]/20">
-                    <Icon
-                      className="h-4.5 w-4.5 text-[--success]"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <h3 className="font-display text-base font-semibold">
-                    {f.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    {f.description}
-                  </p>
-                </div>
+                <Reveal key={f.title} delay={i * 100}>
+                  <SpotlightCard className="h-full rounded-xl border bg-card p-5 transition-colors hover:border-foreground/30">
+                    <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[--success]/10 ring-1 ring-[--success]/20">
+                      <Icon
+                        className="h-4.5 w-4.5 text-[--success]"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <h3 className="font-display text-base font-semibold">{f.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                      {f.description}
+                    </p>
+                  </SpotlightCard>
+                </Reveal>
               )
             })}
           </div>
-        </section>
+        </Reveal>
 
         {/* How it works */}
-        <section className="mb-20">
+        <Reveal as="section" className="mb-20">
           <div className="mb-8 max-w-2xl">
             <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
               // how it works
@@ -384,31 +369,17 @@ export default function Home() {
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {STEPS.map((step, i) => (
-              <div key={step.title} className="relative">
-                <div className="rounded-xl border bg-card p-6">
-                  <div className="mb-4 inline-flex h-8 items-center rounded-full border bg-muted px-3 font-mono text-xs text-muted-foreground">
-                    step {String(i + 1).padStart(2, '0')}
-                  </div>
-                  <div className="mb-4 rounded-lg bg-muted/60 p-3 font-mono text-xs ring-1 ring-border">
-                    <span className="text-[--success]">$</span>{' '}
-                    <span className="text-foreground">{step.cmd}</span>
-                  </div>
-                  <h3 className="font-display text-lg font-semibold tracking-tight">
-                    {step.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
+              <Reveal key={step.title} delay={i * 120}>
+                <StepCard step={step} index={i} />
+              </Reveal>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         <Separator className="my-12" />
 
         {/* Stacks */}
-        <section>
+        <Reveal as="section">
           <div className="mb-6 flex items-end justify-between">
             <div>
               <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
@@ -432,83 +403,47 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {filteredStacks.map((stack) => (
-                <StackCard key={stack.slug} stack={stack} />
+              {filteredStacks.map((stack, i) => (
+                <Reveal key={stack.slug} delay={i * 80}>
+                  <StackCard stack={stack} />
+                </Reveal>
               ))}
             </div>
           )}
-        </section>
+        </Reveal>
 
         {/* Roadmap — honest about what's here now vs coming */}
-        <section id="roadmap" className="mt-20 scroll-mt-20">
-          <div className="mb-8 max-w-2xl">
-            <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              // roadmap
+        <Reveal as="section" className="mt-20" >
+          <div id="roadmap" className="scroll-mt-20">
+            <div className="mb-8 max-w-2xl">
+              <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                // roadmap
+              </div>
+              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                เป้าหมายระยะยาว: ครบทุกด้านของ dev
+              </h2>
+              <p className="mt-3 text-muted-foreground">
+                Backend เริ่มก่อนเพราะจับต้องได้ง่าย รันใน container ได้ทันที —
+                จากนั้นจะค่อยๆ เพิ่มส่วนอื่นๆ ที่ dev ควรรู้
+              </p>
             </div>
-            <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-              เป้าหมายระยะยาว: ครบทุกด้านของ dev
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Backend เริ่มก่อนเพราะจับต้องได้ง่าย รันใน container ได้ทันที —
-              จากนั้นจะค่อยๆ เพิ่มส่วนอื่นๆ ที่ dev ควรรู้
-            </p>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              {ROADMAP.map((item, i) => (
+                <Reveal key={item.title} delay={i * 80}>
+                  <RoadmapCard item={item} index={i} />
+                </Reveal>
+              ))}
+            </div>
           </div>
-
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {ROADMAP.map((item, i) => {
-              const Icon = item.icon
-              return (
-                <div
-                  key={item.title}
-                  className="relative flex flex-col rounded-xl border bg-card p-5"
-                >
-                  {/* Connector dot (visual rhythm, desktop only) */}
-                  <div className="mb-4 flex items-center justify-between">
-                    <div
-                      className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ring-1 ${
-                        item.status === 'available'
-                          ? 'bg-[--success]/10 ring-[--success]/30'
-                          : 'bg-muted ring-border'
-                      }`}
-                      aria-hidden="true"
-                    >
-                      <Icon
-                        className={`h-4.5 w-4.5 ${
-                          item.status === 'available'
-                            ? 'text-[--success]'
-                            : 'text-muted-foreground'
-                        }`}
-                      />
-                    </div>
-                    <StatusBadge status={item.status} />
-                  </div>
-
-                  <h3 className="font-display text-base font-semibold tracking-tight">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {item.description}
-                  </p>
-                  <p className="mt-4 border-t pt-3 font-mono text-[11px] text-muted-foreground">
-                    {item.topics}
-                  </p>
-
-                  {/* Step index — subtle */}
-                  <span
-                    className="absolute right-4 top-4 font-mono text-[10px] tabular-nums text-muted-foreground/60"
-                    aria-hidden="true"
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        </section>
+        </Reveal>
 
         {/* Bottom CTA */}
         {!user && (
-          <section className="mt-20 overflow-hidden rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-8 text-center sm:p-12">
+          <Reveal
+            as="section"
+            className="mt-20 overflow-hidden rounded-2xl border bg-gradient-to-br from-card to-muted/30 p-8 text-center sm:p-12"
+          >
             <Rocket
               className="mx-auto mb-4 h-10 w-10 text-[--success]"
               aria-hidden="true"
@@ -530,7 +465,7 @@ export default function Home() {
                 <Link to="/login">มีบัญชีอยู่แล้ว</Link>
               </Button>
             </div>
-          </section>
+          </Reveal>
         )}
       </div>
     </div>
@@ -555,8 +490,14 @@ function StatusBadge({ status }: { status: RoadmapItem['status'] }) {
   const { label, className } = map[status]
   return (
     <span
-      className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ring-1 ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ring-1 ${className}`}
     >
+      {status === 'available' && (
+        <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[--success] opacity-75 motion-reduce:hidden" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[--success]" />
+        </span>
+      )}
       {label}
     </span>
   )
@@ -571,37 +512,151 @@ function StackCard({ stack }: { stack: Stack }) {
       className="group cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       aria-label={`เริ่มเรียน ${stack.name} — ${stack.labCount} labs`}
     >
-      <Card className="h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-md">
-        <CardHeader className="pb-3">
-          <div className="mb-3 flex items-center justify-between">
-            <div
-              className={`inline-flex h-10 w-10 items-center justify-center rounded-lg ${t.bg} ring-1 ${t.ring}`}
-              aria-hidden="true"
-            >
-              <Icon className={`h-5 w-5 ${t.icon}`} />
+      <SpotlightCard className="h-full">
+        <Card className="h-full bg-transparent transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-md">
+          <CardHeader className="pb-3">
+            <div className="mb-3 flex items-center justify-between">
+              <div
+                className={`inline-flex h-10 w-10 items-center justify-center rounded-lg ${t.bg} ring-1 ${t.ring}`}
+                aria-hidden="true"
+              >
+                <Icon className={`h-5 w-5 ${t.icon}`} />
+              </div>
+              <span className="rounded-full border bg-background px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                {stack.level}
+              </span>
             </div>
-            <span className="rounded-full border bg-background px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              {stack.level}
-            </span>
-          </div>
-          <CardTitle className="flex items-center justify-between font-display text-lg tracking-tight">
-            {stack.name}
-            <ArrowRight
-              className="h-4 w-4 shrink-0 translate-x-0 text-muted-foreground opacity-0 transition-all duration-200 group-hover:translate-x-1 group-hover:opacity-100"
-              aria-hidden="true"
-            />
-          </CardTitle>
-          <CardDescription className="leading-snug">
-            {stack.description}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="flex items-center justify-between border-t pt-3 font-mono text-xs text-muted-foreground">
-            <span>{stack.labCount} labs</span>
-            <span className="text-[--success]">→ เริ่มเรียน</span>
-          </div>
-        </CardContent>
-      </Card>
+            <CardTitle className="flex items-center justify-between font-display text-lg tracking-tight">
+              {stack.name}
+              <ArrowRight
+                className="h-4 w-4 shrink-0 translate-x-0 text-muted-foreground opacity-0 transition-all duration-200 group-hover:translate-x-1 group-hover:opacity-100"
+                aria-hidden="true"
+              />
+            </CardTitle>
+            <CardDescription className="leading-snug">
+              {stack.description}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex items-center justify-between border-t pt-3 font-mono text-xs text-muted-foreground">
+              <span>{stack.labCount} labs</span>
+              <span className="text-[--success]">→ เริ่มเรียน</span>
+            </div>
+          </CardContent>
+        </Card>
+      </SpotlightCard>
     </Link>
+  )
+}
+
+/**
+ * Stats strip — animate counter from 0 → target เมื่อเข้ามาใน viewport
+ */
+function StatsStrip() {
+  const [ref, inView] = useInView<HTMLDivElement>()
+  const labs = useCountUp({ start: inView, end: TOTAL_LABS, duration: 1400 })
+  const stacks = useCountUp({ start: inView, end: STACKS.length, duration: 1000 })
+  const handsOn = useCountUp({ start: inView, end: 100, duration: 1500 })
+  // ราคา: ใช้ string เลย ไม่ animate
+  return (
+    <div
+      ref={ref}
+      aria-label="Statistics"
+      className="grid grid-cols-2 gap-6 rounded-xl border bg-muted/30 p-6 sm:grid-cols-4 sm:p-8"
+    >
+      <Stat value={labs} label="labs" />
+      <Stat value={stacks} label="stacks" />
+      <Stat value={`${handsOn}%`} label="hands-on" />
+      <Stat value="0฿" label="ใช้ฟรี" />
+    </div>
+  )
+}
+
+function Stat({ value, label }: { value: string | number; label: string }) {
+  return (
+    <div className="text-center">
+      <div className="font-display text-3xl font-bold tabular-nums tracking-tighter sm:text-4xl">
+        {value}
+      </div>
+      <div className="mt-1 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+        {label}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Step card — typewriter "step 0X" label เมื่อเข้ามาใน view
+ */
+function StepCard({ step, index }: { step: (typeof STEPS)[number]; index: number }) {
+  const [ref, inView] = useInView<HTMLDivElement>()
+  const stepLabel = useTypewriter({
+    text: `step ${String(index + 1).padStart(2, '0')}`,
+    start: inView,
+    speed: 60,
+  })
+  return (
+    <div ref={ref} className="relative">
+      <SpotlightCard className="h-full rounded-xl border bg-card p-6">
+        <div className="mb-4 inline-flex h-8 min-w-[70px] items-center rounded-full border bg-muted px-3 font-mono text-xs text-muted-foreground">
+          {stepLabel || '\u00A0'}
+        </div>
+        <div className="mb-4 rounded-lg bg-muted/60 p-3 font-mono text-xs ring-1 ring-border">
+          <span className="text-[--success]">$</span>{' '}
+          <span className="text-foreground">{step.cmd}</span>
+        </div>
+        <h3 className="font-display text-lg font-semibold tracking-tight">
+          {step.title}
+        </h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+          {step.description}
+        </p>
+      </SpotlightCard>
+    </div>
+  )
+}
+
+/**
+ * Roadmap card — SpotlightCard wrapper + step number
+ */
+function RoadmapCard({ item, index }: { item: RoadmapItem; index: number }) {
+  const Icon = item.icon
+  return (
+    <SpotlightCard className="relative flex h-full flex-col rounded-xl border bg-card p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div
+          className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ring-1 ${
+            item.status === 'available'
+              ? 'bg-[--success]/10 ring-[--success]/30'
+              : 'bg-muted ring-border'
+          }`}
+          aria-hidden="true"
+        >
+          <Icon
+            className={`h-4.5 w-4.5 ${
+              item.status === 'available' ? 'text-[--success]' : 'text-muted-foreground'
+            }`}
+          />
+        </div>
+        <StatusBadge status={item.status} />
+      </div>
+
+      <h3 className="font-display text-base font-semibold tracking-tight">
+        {item.title}
+      </h3>
+      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+        {item.description}
+      </p>
+      <p className="mt-4 border-t pt-3 font-mono text-[11px] text-muted-foreground">
+        {item.topics}
+      </p>
+
+      <span
+        className="absolute right-4 top-4 font-mono text-[10px] tabular-nums text-muted-foreground/60"
+        aria-hidden="true"
+      >
+        {String(index + 1).padStart(2, '0')}
+      </span>
+    </SpotlightCard>
   )
 }

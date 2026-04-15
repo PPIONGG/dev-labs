@@ -26,6 +26,8 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/hooks/useAuth'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useEffect, useState } from 'react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface StackProgress {
   slug: string
@@ -182,17 +184,8 @@ export default function Profile() {
             </div>
           </div>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full bg-[--success] transition-all"
-            style={{ width: `${overallPct}%` }}
-            role="progressbar"
-            aria-valuenow={overallPct}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="ความคืบหน้ารวม"
-          />
-        </div>
+        <ProgressBar value={overallPct} ariaLabel="ความคืบหน้ารวม" height="h-2" />
+
         {totalDone === 0 && (
           <p className="mt-3 text-sm text-muted-foreground">
             ยังไม่ได้เริ่ม lab ไหนเลย — เริ่มที่ stack แรกได้เลย ↓
@@ -247,17 +240,7 @@ export default function Profile() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                      <div
-                        className="h-full bg-[--success] transition-all"
-                        style={{ width: `${pct}%` }}
-                        role="progressbar"
-                        aria-valuenow={pct}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-label={`${s.name} progress`}
-                      />
-                    </div>
+                    <ProgressBar value={pct} ariaLabel={`${s.name} progress`} height="h-1.5" />
                   </CardContent>
                 </Card>
               </Link>
@@ -265,6 +248,47 @@ export default function Profile() {
           })}
         </div>
       </section>
+    </div>
+  )
+}
+
+/**
+ * Animated progress bar — start ที่ 0 → animate ไปค่าจริง 700ms ตอน mount
+ * (เคารพ prefers-reduced-motion → set ค่าเลย)
+ */
+function ProgressBar({
+  value,
+  ariaLabel,
+  height = 'h-2',
+}: {
+  value: number
+  ariaLabel: string
+  height?: string
+}) {
+  const reduced = useReducedMotion()
+  const [width, setWidth] = useState(reduced ? value : 0)
+
+  useEffect(() => {
+    if (reduced) {
+      setWidth(value)
+      return
+    }
+    // Delay nudge เพื่อให้ transition กระตุก (browser repaint)
+    const id = requestAnimationFrame(() => setWidth(value))
+    return () => cancelAnimationFrame(id)
+  }, [value, reduced])
+
+  return (
+    <div className={`overflow-hidden rounded-full bg-muted ${height}`}>
+      <div
+        className="h-full rounded-full bg-[--success] transition-[width] duration-700 ease-out"
+        style={{ width: `${width}%` }}
+        role="progressbar"
+        aria-valuenow={value}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={ariaLabel}
+      />
     </div>
   )
 }
