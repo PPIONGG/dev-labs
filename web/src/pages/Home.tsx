@@ -14,6 +14,9 @@ import {
   Gauge,
   Languages,
   Boxes,
+  Palette,
+  GitBranch,
+  CloudCog,
   type LucideIcon,
 } from 'lucide-react'
 import {
@@ -152,6 +155,45 @@ const STEPS = [
   },
 ]
 
+interface RoadmapItem {
+  icon: LucideIcon
+  title: string
+  description: string
+  status: 'available' | 'next' | 'planned'
+  topics: string
+}
+
+const ROADMAP: RoadmapItem[] = [
+  {
+    icon: Database,
+    title: 'Backend',
+    description: 'Database, caching, containerization',
+    status: 'available',
+    topics: 'Docker · PostgreSQL · Redis · MongoDB',
+  },
+  {
+    icon: Palette,
+    title: 'Frontend',
+    description: 'UI frameworks, styling, state management',
+    status: 'next',
+    topics: 'React · Tailwind · Component patterns',
+  },
+  {
+    icon: GitBranch,
+    title: 'Git & Collaboration',
+    description: 'Version control + team workflow',
+    status: 'next',
+    topics: 'Branching · PR · Conflict resolution',
+  },
+  {
+    icon: CloudCog,
+    title: 'DevOps & Cloud',
+    description: 'CI/CD, monitoring, deployment',
+    status: 'planned',
+    topics: 'GitHub Actions · Kubernetes · Observability',
+  },
+]
+
 const TOTAL_LABS = STACKS.reduce((sum, s) => sum + s.labCount, 0)
 
 export default function Home() {
@@ -190,7 +232,7 @@ export default function Home() {
             </div>
 
             <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tighter sm:text-5xl lg:text-6xl">
-              เรียน Backend
+              ฝึก Dev Skills
               <br />
               <span className="bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
                 ด้วยของจริง.
@@ -198,8 +240,13 @@ export default function Home() {
             </h1>
 
             <p className="max-w-xl text-base text-muted-foreground sm:text-lg">
-              Docker, PostgreSQL, Redis, MongoDB — 65 labs ที่รันใน container จริง
-              เขียนโค้ดจริง เก็บความคืบหน้าไว้ดูย้อนหลังได้ในเว็บเดียว
+              คลังฝึก developer แบบ hands-on — เริ่มจาก{' '}
+              <span className="font-medium text-foreground">65 labs backend</span>{' '}
+              (Docker, PostgreSQL, Redis, MongoDB) ที่รันใน container จริง
+              <br className="hidden sm:block" />
+              จะขยายไปทาง <span className="font-medium text-foreground">Frontend</span>,{' '}
+              <span className="font-medium text-foreground">Git</span>,{' '}
+              <span className="font-medium text-foreground">DevOps</span> ต่อไปเรื่อยๆ
             </p>
 
             {/* Search */}
@@ -359,11 +406,14 @@ export default function Home() {
           <div className="mb-6 flex items-end justify-between">
             <div>
               <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                // learning paths
+                // available now · backend
               </div>
               <h2 className="mt-1 font-display text-2xl font-bold tracking-tight sm:text-3xl">
                 เลือกหัวข้อที่สนใจ
               </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                ตอนนี้มี 4 stacks พร้อมเรียน — คลิกเพื่อเข้าไปดู labs
+              </p>
             </div>
             <p className="hidden font-mono text-xs text-muted-foreground sm:block">
               {filteredStacks.length} / {STACKS.length} stacks
@@ -381,6 +431,73 @@ export default function Home() {
               ))}
             </div>
           )}
+        </section>
+
+        {/* Roadmap — honest about what's here now vs coming */}
+        <section className="mt-20">
+          <div className="mb-8 max-w-2xl">
+            <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              // roadmap
+            </div>
+            <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              เป้าหมายระยะยาว: ครบทุกด้านของ dev
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Backend เริ่มก่อนเพราะจับต้องได้ง่าย รันใน container ได้ทันที —
+              จากนั้นจะค่อยๆ เพิ่มส่วนอื่นๆ ที่ dev ควรรู้
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {ROADMAP.map((item, i) => {
+              const Icon = item.icon
+              return (
+                <div
+                  key={item.title}
+                  className="relative flex flex-col rounded-xl border bg-card p-5"
+                >
+                  {/* Connector dot (visual rhythm, desktop only) */}
+                  <div className="mb-4 flex items-center justify-between">
+                    <div
+                      className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ring-1 ${
+                        item.status === 'available'
+                          ? 'bg-[--success]/10 ring-[--success]/30'
+                          : 'bg-muted ring-border'
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <Icon
+                        className={`h-4.5 w-4.5 ${
+                          item.status === 'available'
+                            ? 'text-[--success]'
+                            : 'text-muted-foreground'
+                        }`}
+                      />
+                    </div>
+                    <StatusBadge status={item.status} />
+                  </div>
+
+                  <h3 className="font-display text-base font-semibold tracking-tight">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {item.description}
+                  </p>
+                  <p className="mt-4 border-t pt-3 font-mono text-[11px] text-muted-foreground">
+                    {item.topics}
+                  </p>
+
+                  {/* Step index — subtle */}
+                  <span
+                    className="absolute right-4 top-4 font-mono text-[10px] tabular-nums text-muted-foreground/60"
+                    aria-hidden="true"
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </section>
 
         {/* Bottom CTA */}
@@ -411,6 +528,31 @@ export default function Home() {
         )}
       </div>
     </div>
+  )
+}
+
+function StatusBadge({ status }: { status: RoadmapItem['status'] }) {
+  const map = {
+    available: {
+      label: 'พร้อมใช้',
+      className: 'bg-[--success]/10 text-[--success] ring-[--success]/30',
+    },
+    next: {
+      label: 'เร็วๆ นี้',
+      className: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 ring-amber-500/30',
+    },
+    planned: {
+      label: 'วางแผนไว้',
+      className: 'bg-muted text-muted-foreground ring-border',
+    },
+  } as const
+  const { label, className } = map[status]
+  return (
+    <span
+      className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ring-1 ${className}`}
+    >
+      {label}
+    </span>
   )
 }
 
