@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../lib/prisma.js'
+import { LAB_SLUG_PATTERN } from '../lib/labSlug.js'
 import { requireAuth } from '../middleware/auth.js'
 
 export const progressRouter = Router()
@@ -10,15 +11,6 @@ export const progressRouter = Router()
 progressRouter.use(requireAuth)
 
 // -------------------- Validation --------------------
-
-/**
- * labSlug รูปแบบ "<stack>/<lab-folder>"
- * - stack: docker | postgresql | redis | mongodb
- * - lab-folder: "lab-NN-<slug-words>" (เช่น "lab-01-what-is-docker")
- *
- * Pattern strict ป้องกัน arbitrary string ลง DB
- */
-const LAB_SLUG_PATTERN = /^(docker|postgresql|redis|mongodb)\/lab-\d{1,3}-[a-z0-9-]+$/
 
 const labSlugSchema = z
   .string()
