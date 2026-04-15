@@ -4,6 +4,9 @@
   "private": true,
   "description": "Backend API สำหรับเว็บ dev-labs",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
