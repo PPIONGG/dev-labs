@@ -1,0 +1,12 @@
+{
+  "name": "redis-pubsub-demo",
+  "version": "1.0.0",
+  "description": "Redis Pub/Sub publisher and subscriber demo",
+  "scripts": {
+    "publisher": "node publisher.js",
+    "subscriber": "node subscriber.js"
+  },
+  "dependencies": {
+    "ioredis": "^5.3.2"
+  }
+}

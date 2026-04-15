@@ -1,0 +1,113 @@
+# แบบฝึกหัด Lab 11 — Streams
+# ให้ทำตามลำดับ แล้วตรวจสอบผลลัพธ์
+
+# === ส่วนที่ 1: พื้นฐาน Stream ===
+
+# 1.1 สร้าง stream "events" พร้อมเพิ่ม 5 entries
+XADD events * type "login" user "alice" ip "192.168.1.1"
+XADD events * type "view" user "alice" page "/dashboard"
+XADD events * type "click" user "bob" button "buy-now"
+XADD events * type "purchase" user "bob" item "Redis Book" amount 590
+XADD events * type "logout" user "alice" duration 3600
+
+# 1.2 นับจำนวน entries
+XLEN events
+
+# 1.3 อ่านทุก entries (เก่า → ใหม่)
+XRANGE events - +
+
+# 1.4 อ่าน 3 entries ล่าสุด (ใหม่ → เก่า)
+XREVRANGE events + - COUNT 3
+
+# 1.5 อ่าน 2 entries แรก
+XRANGE events - + COUNT 2
+
+# 1.6 ดูข้อมูล stream
+XINFO STREAM events
+
+# === ส่วนที่ 2: XREAD ===
+
+# 2.1 อ่าน entries ทั้งหมดด้วย XREAD
+XREAD COUNT 10 STREAMS events 0
+
+# 2.2 ลองใช้ XREAD BLOCK (เปิด terminal ใหม่แล้ว XADD เพื่อทดสอบ)
+# Terminal 1:
+XREAD BLOCK 10000 COUNT 1 STREAMS events $
+# Terminal 2 (ภายใน 10 วินาที):
+# XADD events * type "test" user "tester" action "trigger-block"
+
+# === ส่วนที่ 3: Consumer Groups ===
+
+# 3.1 สร้าง Consumer Group "event-processors" เริ่มจาก entry แรก
+XGROUP CREATE events event-processors 0
+
+# 3.2 Worker-1 อ่าน 2 messages
+XREADGROUP GROUP event-processors worker-1 COUNT 2 STREAMS events >
+
+# 3.3 Worker-2 อ่าน 2 messages (จะได้ messages ถัดไป ไม่ซ้ำกับ worker-1)
+XREADGROUP GROUP event-processors worker-2 COUNT 2 STREAMS events >
+
+# 3.4 Worker-1 อ่านอีก 1 message
+XREADGROUP GROUP event-processors worker-1 COUNT 1 STREAMS events >
+
+# 3.5 ตรวจสอบ pending messages (ยังไม่ ACK)
+XPENDING events event-processors
+
+# 3.6 ดูรายละเอียด pending ทุก messages
+XPENDING events event-processors - + 10
+
+# 3.7 ดู consumers ใน group
+XINFO CONSUMERS events event-processors
+
+# === ส่วนที่ 4: XACK ===
+
+# 4.1 ACK message แรกของ worker-1 (ใส่ ID จากผลลัพธ์ข้อ 3.2)
+# XACK events event-processors <message-id-1>
+
+# 4.2 ตรวจสอบ pending อีกครั้ง (ควรลดลง 1)
+XPENDING events event-processors
+
+# 4.3 ACK ทุก messages ของ worker-2
+# XACK events event-processors <message-id-3> <message-id-4>
+
+# === ส่วนที่ 5: Activity Log ===
+
+# 5.1 สร้าง activity log stream
+XADD activity-log * action "user.created" userId 1001 details "New user registration"
+XADD activity-log * action "user.login" userId 1001 details "Login from Chrome"
+XADD activity-log * action "order.created" userId 1001 orderId 5001 details "New order placed"
+XADD activity-log * action "payment.completed" userId 1001 orderId 5001 amount 1500
+XADD activity-log * action "order.shipped" orderId 5001 details "Shipped via Kerry Express"
+
+# 5.2 อ่าน log ทั้งหมด
+XRANGE activity-log - +
+
+# 5.3 อ่าน log ล่าสุด 3 รายการ
+XREVRANGE activity-log + - COUNT 3
+
+# 5.4 จำกัดขนาด stream (เก็บแค่ 1000 entries)
+XTRIM activity-log MAXLEN ~ 1000
+
+# 5.5 นับจำนวน entries
+XLEN activity-log
+
+# === ส่วนที่ 6: Multiple Streams ===
+
+# 6.1 สร้าง stream สำหรับ orders
+XADD stream:orders * orderId 1 customer "alice" total 1500
+XADD stream:orders * orderId 2 customer "bob" total 2300
+
+# 6.2 สร้าง stream สำหรับ payments
+XADD stream:payments * paymentId 1 orderId 1 method "credit_card" status "success"
+XADD stream:payments * paymentId 2 orderId 2 method "bank_transfer" status "pending"
+
+# 6.3 อ่านจากหลาย streams พร้อมกัน
+XREAD COUNT 5 STREAMS stream:orders stream:payments 0 0
+
+# 6.4 สร้าง Consumer Group สำหรับแต่ละ stream
+XGROUP CREATE stream:orders order-handlers 0
+XGROUP CREATE stream:payments payment-handlers 0
+
+# 6.5 อ่าน message จากแต่ละ group
+XREADGROUP GROUP order-handlers handler-1 COUNT 5 STREAMS stream:orders >
+XREADGROUP GROUP payment-handlers handler-1 COUNT 5 STREAMS stream:payments >

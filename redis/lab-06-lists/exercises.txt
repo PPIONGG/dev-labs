@@ -1,0 +1,232 @@
+================================================================
+แบบฝึกหัด Lab 06 -- Lists
+================================================================
+
+เปิด redis-cli แล้วลองทำแบบฝึกหัดต่อไปนี้
+ลองทำเองก่อนดูเฉลย!
+
+================================================================
+แบบฝึกหัดที่ 1: LPUSH & RPUSH
+================================================================
+
+โจทย์:
+1. สร้าง list "shopping" โดยเพิ่ม "milk" ที่หัว
+2. เพิ่ม "bread" ที่หัว
+3. เพิ่ม "eggs" ที่ท้าย
+4. เพิ่ม "butter" ที่ท้าย
+5. ดูข้อมูลทั้งหมดด้วย LRANGE
+
+--- เฉลย ---
+
+LPUSH shopping "milk"
+LPUSH shopping "bread"
+RPUSH shopping "eggs"
+RPUSH shopping "butter"
+LRANGE shopping 0 -1
+# ผลลัพธ์:
+# 1) "bread"
+# 2) "milk"
+# 3) "eggs"
+# 4) "butter"
+
+================================================================
+แบบฝึกหัดที่ 2: LPOP & RPOP
+================================================================
+
+โจทย์: (ต่อจากข้อ 1)
+1. ดึงรายการแรกออก (LPOP)
+2. ดึงรายการสุดท้ายออก (RPOP)
+3. ดูข้อมูลที่เหลือ
+4. ดูจำนวนรายการที่เหลือ
+
+--- เฉลย ---
+
+LPOP shopping
+# ผลลัพธ์: "bread"
+
+RPOP shopping
+# ผลลัพธ์: "butter"
+
+LRANGE shopping 0 -1
+# ผลลัพธ์:
+# 1) "milk"
+# 2) "eggs"
+
+LLEN shopping
+# ผลลัพธ์: (integer) 2
+
+================================================================
+แบบฝึกหัดที่ 3: จำลอง Queue (FIFO)
+================================================================
+
+โจทย์: จำลอง email queue
+1. เพิ่ม 4 emails เข้า queue (ใช้ RPUSH)
+   - "email:welcome"
+   - "email:order-confirm"
+   - "email:shipping"
+   - "email:feedback"
+2. ประมวลผล (LPOP) ทีละ email -- ดูว่าได้ลำดับถูกต้องไหม
+3. ดูจำนวนที่เหลือ
+
+--- เฉลย ---
+
+RPUSH email:queue "email:welcome"
+RPUSH email:queue "email:order-confirm"
+RPUSH email:queue "email:shipping"
+RPUSH email:queue "email:feedback"
+
+LPOP email:queue
+# ผลลัพธ์: "email:welcome" (เข้าก่อน ออกก่อน)
+
+LPOP email:queue
+# ผลลัพธ์: "email:order-confirm"
+
+LLEN email:queue
+# ผลลัพธ์: (integer) 2
+
+LPOP email:queue
+# ผลลัพธ์: "email:shipping"
+
+LPOP email:queue
+# ผลลัพธ์: "email:feedback"
+
+LLEN email:queue
+# ผลลัพธ์: (integer) 0
+
+================================================================
+แบบฝึกหัดที่ 4: จำลอง Stack (LIFO)
+================================================================
+
+โจทย์: จำลอง undo stack
+1. Push 3 actions: "type A", "type B", "delete B" (ใช้ LPUSH)
+2. Undo (LPOP) -- ควรได้ action ล่าสุดก่อน
+3. Undo อีกครั้ง
+
+--- เฉลย ---
+
+LPUSH undo:stack "type A"
+LPUSH undo:stack "type B"
+LPUSH undo:stack "delete B"
+
+LPOP undo:stack
+# ผลลัพธ์: "delete B" (เข้าหลัง ออกก่อน)
+
+LPOP undo:stack
+# ผลลัพธ์: "type B"
+
+LRANGE undo:stack 0 -1
+# ผลลัพธ์:
+# 1) "type A"
+
+================================================================
+แบบฝึกหัดที่ 5: Recent Items + LTRIM
+================================================================
+
+โจทย์: เก็บ 5 สินค้าที่ดูล่าสุด
+1. เพิ่มสินค้าที่ดู 8 ชิ้น (ใช้ LPUSH)
+   - product:1 ถึง product:8
+2. Trim ให้เหลือ 5 ล่าสุด
+3. ดูผลลัพธ์
+
+--- เฉลย ---
+
+LPUSH recent:viewed "product:1"
+LPUSH recent:viewed "product:2"
+LPUSH recent:viewed "product:3"
+LPUSH recent:viewed "product:4"
+LPUSH recent:viewed "product:5"
+LPUSH recent:viewed "product:6"
+LPUSH recent:viewed "product:7"
+LPUSH recent:viewed "product:8"
+
+LTRIM recent:viewed 0 4
+
+LRANGE recent:viewed 0 -1
+# ผลลัพธ์:
+# 1) "product:8"
+# 2) "product:7"
+# 3) "product:6"
+# 4) "product:5"
+# 5) "product:4"
+
+LLEN recent:viewed
+# ผลลัพธ์: (integer) 5
+
+================================================================
+แบบฝึกหัดที่ 6: LINDEX & LSET
+================================================================
+
+โจทย์:
+1. สร้าง list "playlist" = ["Song A", "Song B", "Song C", "Song D"]
+2. ดูเพลงที่ตำแหน่ง 2
+3. เปลี่ยนเพลงที่ตำแหน่ง 1 เป็น "Song X"
+4. ดู list ทั้งหมด
+
+--- เฉลย ---
+
+RPUSH playlist "Song A" "Song B" "Song C" "Song D"
+
+LINDEX playlist 2
+# ผลลัพธ์: "Song C"
+
+LSET playlist 1 "Song X"
+
+LRANGE playlist 0 -1
+# ผลลัพธ์:
+# 1) "Song A"
+# 2) "Song X"
+# 3) "Song C"
+# 4) "Song D"
+
+================================================================
+แบบฝึกหัดที่ 7: LREM
+================================================================
+
+โจทย์:
+1. สร้าง list "tags" = ["redis", "docker", "redis", "node", "redis", "express"]
+2. ลบ "redis" ออก 2 ตัว (จากหัว)
+3. ดู list ที่เหลือ
+
+--- เฉลย ---
+
+RPUSH tags "redis" "docker" "redis" "node" "redis" "express"
+
+LREM tags 2 "redis"
+# ผลลัพธ์: (integer) 2
+
+LRANGE tags 0 -1
+# ผลลัพธ์:
+# 1) "docker"
+# 2) "node"
+# 3) "redis"
+# 4) "express"
+
+================================================================
+แบบฝึกหัดที่ 8: LINSERT
+================================================================
+
+โจทย์:
+1. สร้าง list "steps" = ["login", "browse", "checkout"]
+2. แทรก "add-to-cart" ก่อน "checkout"
+3. แทรก "payment" หลัง "checkout"
+4. ดู list ทั้งหมด
+
+--- เฉลย ---
+
+RPUSH steps "login" "browse" "checkout"
+
+LINSERT steps BEFORE "checkout" "add-to-cart"
+LINSERT steps AFTER "checkout" "payment"
+
+LRANGE steps 0 -1
+# ผลลัพธ์:
+# 1) "login"
+# 2) "browse"
+# 3) "add-to-cart"
+# 4) "checkout"
+# 5) "payment"
+
+================================================================
+อ่านจบแล้ว ทำ FLUSHDB เพื่อล้างข้อมูลทดสอบ
+แล้วไปต่อ Lab 07 -- Sets & Sorted Sets
+================================================================

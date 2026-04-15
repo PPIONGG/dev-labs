@@ -1,0 +1,9 @@
+node_modules
+.git
+*.md
+tests/
+coverage/
+.github/
+docker-compose*.yml
+.env
+.env.*

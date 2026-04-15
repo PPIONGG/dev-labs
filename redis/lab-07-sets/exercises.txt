@@ -1,0 +1,288 @@
+================================================================
+แบบฝึกหัด Lab 07 -- Sets & Sorted Sets
+================================================================
+
+เปิด redis-cli แล้วลองทำแบบฝึกหัดต่อไปนี้
+ลองทำเองก่อนดูเฉลย!
+
+================================================================
+Part 1: Sets
+================================================================
+
+================================================================
+แบบฝึกหัดที่ 1: SADD & SMEMBERS
+================================================================
+
+โจทย์:
+1. สร้าง set "backend:skills" มีสมาชิก: "node", "python", "go", "java"
+2. สร้าง set "frontend:skills" มีสมาชิก: "react", "vue", "angular", "svelte"
+3. ดูสมาชิกของแต่ละ set
+4. ลองเพิ่ม "node" เข้า backend:skills อีกครั้ง -- จะเกิดอะไรขึ้น?
+
+--- เฉลย ---
+
+SADD backend:skills "node" "python" "go" "java"
+SADD frontend:skills "react" "vue" "angular" "svelte"
+
+SMEMBERS backend:skills
+# ผลลัพธ์: "node", "python", "go", "java" (อาจคนละลำดับ)
+
+SMEMBERS frontend:skills
+# ผลลัพธ์: "react", "vue", "angular", "svelte"
+
+SADD backend:skills "node"
+# ผลลัพธ์: (integer) 0 -- ไม่ได้เพิ่ม เพราะมีอยู่แล้ว (Set ไม่ซ้ำ)
+
+================================================================
+แบบฝึกหัดที่ 2: SISMEMBER & SCARD
+================================================================
+
+โจทย์:
+1. ตรวจสอบว่า "python" อยู่ใน backend:skills หรือไม่
+2. ตรวจสอบว่า "rust" อยู่ใน backend:skills หรือไม่
+3. นับจำนวน skills ใน frontend:skills
+
+--- เฉลย ---
+
+SISMEMBER backend:skills "python"
+# ผลลัพธ์: (integer) 1 -- มี
+
+SISMEMBER backend:skills "rust"
+# ผลลัพธ์: (integer) 0 -- ไม่มี
+
+SCARD frontend:skills
+# ผลลัพธ์: (integer) 4
+
+================================================================
+แบบฝึกหัดที่ 3: Set Operations
+================================================================
+
+โจทย์:
+1. สร้าง set "team:a" = {"Alice", "Bob", "Charlie", "Dave"}
+2. สร้าง set "team:b" = {"Bob", "Dave", "Eve", "Frank"}
+3. หาสมาชิกที่อยู่ทั้งสองทีม (SINTER)
+4. หาสมาชิกทั้งหมดจากทุกทีม (SUNION)
+5. หาสมาชิกที่อยู่ใน team:a แต่ไม่อยู่ใน team:b (SDIFF)
+
+--- เฉลย ---
+
+SADD team:a "Alice" "Bob" "Charlie" "Dave"
+SADD team:b "Bob" "Dave" "Eve" "Frank"
+
+SINTER team:a team:b
+# ผลลัพธ์: "Bob", "Dave"
+
+SUNION team:a team:b
+# ผลลัพธ์: "Alice", "Bob", "Charlie", "Dave", "Eve", "Frank"
+
+SDIFF team:a team:b
+# ผลลัพธ์: "Alice", "Charlie"
+
+================================================================
+แบบฝึกหัดที่ 4: Unique Visitors
+================================================================
+
+โจทย์: จำลองนับ unique visitors ของเว็บวันนี้
+1. เพิ่ม visitors 6 คน (มี 2 คนซ้ำ):
+   "user:1", "user:2", "user:3", "user:1", "user:4", "user:2"
+2. นับจำนวน unique visitors
+3. ตรวจสอบว่า "user:5" เคยเข้าหรือยัง
+
+--- เฉลย ---
+
+SADD visitors:today "user:1"
+SADD visitors:today "user:2"
+SADD visitors:today "user:3"
+SADD visitors:today "user:1"    # ซ้ำ
+SADD visitors:today "user:4"
+SADD visitors:today "user:2"    # ซ้ำ
+
+SCARD visitors:today
+# ผลลัพธ์: (integer) 4 -- นับไม่ซ้ำ
+
+SISMEMBER visitors:today "user:5"
+# ผลลัพธ์: (integer) 0 -- ยังไม่เคยเข้า
+
+================================================================
+แบบฝึกหัดที่ 5: Tags
+================================================================
+
+โจทย์:
+1. เพิ่ม tags ให้ 3 บทความ:
+   - article:1 → "redis", "database", "nosql"
+   - article:2 → "redis", "caching", "performance"
+   - article:3 → "database", "postgresql", "sql"
+2. หาบทความที่มี tag ร่วมกันระหว่าง article:1 กับ article:2
+3. หา tag ทั้งหมดจากทุกบทความ (SUNION)
+
+--- เฉลย ---
+
+SADD article:1:tags "redis" "database" "nosql"
+SADD article:2:tags "redis" "caching" "performance"
+SADD article:3:tags "database" "postgresql" "sql"
+
+SINTER article:1:tags article:2:tags
+# ผลลัพธ์: "redis"
+
+SUNION article:1:tags article:2:tags article:3:tags
+# ผลลัพธ์: "redis", "database", "nosql", "caching", "performance", "postgresql", "sql"
+
+================================================================
+Part 2: Sorted Sets
+================================================================
+
+================================================================
+แบบฝึกหัดที่ 6: Leaderboard พื้นฐาน
+================================================================
+
+โจทย์:
+1. สร้าง leaderboard "game:scores" กับผู้เล่น 5 คน:
+   - "Alice" = 2500
+   - "Bob" = 1800
+   - "Charlie" = 3200
+   - "Dave" = 2100
+   - "Eve" = 2900
+2. ดู Top 3 (คะแนนมากที่สุด)
+3. ดูอันดับของ "Dave" (จากมากไปน้อย)
+4. ดูคะแนนของ "Alice"
+
+--- เฉลย ---
+
+ZADD game:scores 2500 "Alice" 1800 "Bob" 3200 "Charlie" 2100 "Dave" 2900 "Eve"
+
+ZREVRANGE game:scores 0 2 WITHSCORES
+# ผลลัพธ์:
+# 1) "Charlie" → 3200
+# 2) "Eve"     → 2900
+# 3) "Alice"   → 2500
+
+ZREVRANK game:scores "Dave"
+# ผลลัพธ์: (integer) 3 -- อันดับ 4 (index เริ่มจาก 0)
+
+ZSCORE game:scores "Alice"
+# ผลลัพธ์: "2500"
+
+================================================================
+แบบฝึกหัดที่ 7: ZINCRBY
+================================================================
+
+โจทย์: (ต่อจากข้อ 6)
+1. "Bob" ได้คะแนนเพิ่ม 1500 (จาก 1800 เป็น 3300)
+2. "Charlie" เสียคะแนน 500 (จาก 3200 เป็น 2700)
+3. ดู Top 3 ใหม่ -- "Bob" ควรเป็นอันดับ 1
+
+--- เฉลย ---
+
+ZINCRBY game:scores 1500 "Bob"
+# ผลลัพธ์: "3300"
+
+ZINCRBY game:scores -500 "Charlie"
+# ผลลัพธ์: "2700"
+
+ZREVRANGE game:scores 0 2 WITHSCORES
+# ผลลัพธ์:
+# 1) "Bob"     → 3300
+# 2) "Eve"     → 2900
+# 3) "Charlie" → 2700
+
+================================================================
+แบบฝึกหัดที่ 8: ZRANGEBYSCORE
+================================================================
+
+โจทย์: (ต่อจากข้อ 7)
+1. หาผู้เล่นที่มีคะแนน 2500-3000
+2. หาผู้เล่นที่มีคะแนนมากกว่า 3000
+3. นับผู้เล่นที่มีคะแนน 2000-3000
+
+--- เฉลย ---
+
+ZRANGEBYSCORE game:scores 2500 3000 WITHSCORES
+# ผลลัพธ์:
+# 1) "Alice"   → 2500
+# 2) "Charlie" → 2700
+# 3) "Eve"     → 2900
+
+ZRANGEBYSCORE game:scores 3000 +inf WITHSCORES
+# ผลลัพธ์:
+# 1) "Bob" → 3300
+
+# หรือเฉพาะ "มากกว่า" 3000 (ไม่รวม 3000)
+ZRANGEBYSCORE game:scores (3000 +inf WITHSCORES
+# ผลลัพธ์:
+# 1) "Bob" → 3300
+
+ZCOUNT game:scores 2000 3000
+# ผลลัพธ์: (integer) 4
+
+================================================================
+แบบฝึกหัดที่ 9: จำลอง Trending Products
+================================================================
+
+โจทย์: จำลองระบบสินค้ายอดนิยม
+1. มีคน search สินค้าต่อไปนี้ (ใช้ ZINCRBY เพิ่มครั้งละ 1):
+   - "iPhone" = 5 ครั้ง
+   - "MacBook" = 3 ครั้ง
+   - "AirPods" = 7 ครั้ง
+   - "iPad" = 2 ครั้ง
+   - "Apple Watch" = 4 ครั้ง
+2. ดู Top 3 สินค้ายอดนิยม
+3. ดูอันดับของ "iPad"
+
+--- เฉลย ---
+
+ZINCRBY trending:products 5 "iPhone"
+ZINCRBY trending:products 3 "MacBook"
+ZINCRBY trending:products 7 "AirPods"
+ZINCRBY trending:products 2 "iPad"
+ZINCRBY trending:products 4 "Apple Watch"
+
+ZREVRANGE trending:products 0 2 WITHSCORES
+# ผลลัพธ์:
+# 1) "AirPods"     → 7
+# 2) "iPhone"      → 5
+# 3) "Apple Watch" → 4
+
+ZREVRANK trending:products "iPad"
+# ผลลัพธ์: (integer) 4 -- อันดับ 5 (index 4)
+
+================================================================
+แบบฝึกหัดที่ 10: Priority Queue
+================================================================
+
+โจทย์: จำลอง priority queue (score น้อย = สำคัญมาก)
+1. เพิ่ม tasks:
+   - "fix-security-bug"  priority: 1 (เร่งด่วน)
+   - "add-dark-mode"     priority: 5 (ไม่เร่ง)
+   - "fix-typo"          priority: 3 (ปานกลาง)
+   - "upgrade-database"  priority: 2 (สำคัญ)
+   - "add-animations"    priority: 4 (ไม่เร่ง)
+2. ดูงานทั้งหมดเรียงตาม priority (สำคัญก่อน)
+3. หยิบงานที่สำคัญที่สุดออกไปทำ (ดูตัวแรกแล้วลบ)
+
+--- เฉลย ---
+
+ZADD task:queue 1 "fix-security-bug" 5 "add-dark-mode" 3 "fix-typo" 2 "upgrade-database" 4 "add-animations"
+
+ZRANGE task:queue 0 -1 WITHSCORES
+# ผลลัพธ์:
+# 1) "fix-security-bug" → 1
+# 2) "upgrade-database" → 2
+# 3) "fix-typo"         → 3
+# 4) "add-animations"   → 4
+# 5) "add-dark-mode"    → 5
+
+# ดูงานสำคัญที่สุด
+ZRANGE task:queue 0 0
+# "fix-security-bug"
+
+# ลบออก (หยิบไปทำแล้ว)
+ZREM task:queue "fix-security-bug"
+
+# ดูงานถัดไป
+ZRANGE task:queue 0 0
+# "upgrade-database"
+
+================================================================
+อ่านจบแล้ว ทำ FLUSHDB เพื่อล้างข้อมูลทดสอบ
+แล้วไปต่อ Lab 08 -- Hashes
+================================================================

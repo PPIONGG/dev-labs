@@ -1,0 +1,101 @@
+# แบบฝึกหัด Lab 08 — Hashes
+# ให้ทำตามลำดับ แล้วตรวจสอบผลลัพธ์
+
+# === ส่วนที่ 1: พื้นฐาน Hash ===
+
+# 1.1 สร้าง hash "employee:101" มี field: name, department, salary, position
+HSET employee:101 name "วิชัย สมบูรณ์" department "Engineering" salary 55000 position "Senior Developer"
+
+# 1.2 อ่านชื่อพนักงาน
+HGET employee:101 name
+
+# 1.3 อ่าน department และ position พร้อมกัน
+HMGET employee:101 department position
+
+# 1.4 อ่านทุก field ของ employee:101
+HGETALL employee:101
+
+# 1.5 ตรวจสอบว่ามี field "email" หรือไม่
+HEXISTS employee:101 email
+
+# 1.6 เพิ่ม field "email" เข้าไป
+HSET employee:101 email "wichai@company.com"
+
+# 1.7 ตรวจสอบ email อีกครั้ง
+HEXISTS employee:101 email
+
+# === ส่วนที่ 2: แก้ไขและลบ ===
+
+# 2.1 ขึ้นเงินเดือน 5000 บาท
+HINCRBY employee:101 salary 5000
+
+# 2.2 ตรวจสอบเงินเดือนใหม่
+HGET employee:101 salary
+
+# 2.3 ลบ field position
+HDEL employee:101 position
+
+# 2.4 นับจำนวน field ที่เหลือ
+HLEN employee:101
+
+# 2.5 ดูรายชื่อ field ทั้งหมด
+HKEYS employee:101
+
+# 2.6 ดูเฉพาะ values ทั้งหมด
+HVALS employee:101
+
+# === ส่วนที่ 3: Use Case - Session Management ===
+
+# 3.1 สร้าง session
+HSET session:sess001 user_id 101 username "wichai" role "admin" login_time "2025-01-15T09:00:00" ip "10.0.1.50"
+
+# 3.2 ตั้ง TTL ให้ session หมดอายุใน 30 นาที (1800 วินาที)
+EXPIRE session:sess001 1800
+
+# 3.3 ตรวจสอบ TTL ที่เหลือ
+TTL session:sess001
+
+# 3.4 อ่านข้อมูล session
+HGETALL session:sess001
+
+# === ส่วนที่ 4: Use Case - Product Catalog ===
+
+# 4.1 สร้างสินค้า 3 รายการ
+HSET product:201 name "MacBook Pro" price 59900 stock 25 category "laptop" rating 4.8
+HSET product:202 name "iPad Air" price 24900 stock 40 category "tablet" rating 4.6
+HSET product:203 name "AirPods Pro" price 8990 stock 100 category "audio" rating 4.7
+
+# 4.2 ลดสต็อก product:201 ลง 3 ชิ้น
+HINCRBY product:201 stock -3
+
+# 4.3 เพิ่ม rating ของ product:202 ขึ้น 0.1
+HINCRBYFLOAT product:202 rating 0.1
+
+# 4.4 เพิ่ม field "discount" ให้ product:203 เฉพาะเมื่อยังไม่มี
+HSETNX product:203 discount 10
+
+# 4.5 ลองเพิ่ม "discount" อีกครั้ง (ควรไม่ overwrite)
+HSETNX product:203 discount 20
+
+# 4.6 ตรวจสอบ discount ของ product:203 (ควรยังเป็น 10)
+HGET product:203 discount
+
+# === ส่วนที่ 5: Use Case - Shopping Cart ===
+
+# 5.1 สร้างตะกร้าสินค้า
+HSET cart:user101 product:201 1 product:202 2 product:203 1
+
+# 5.2 ดูตะกร้าทั้งหมด
+HGETALL cart:user101
+
+# 5.3 เพิ่มจำนวน product:201 อีก 2 ชิ้น
+HINCRBY cart:user101 product:201 2
+
+# 5.4 ลบ product:203 ออกจากตะกร้า
+HDEL cart:user101 product:203
+
+# 5.5 นับจำนวนรายการในตะกร้า
+HLEN cart:user101
+
+# 5.6 ดูรายการสินค้าในตะกร้า (เฉพาะ product IDs)
+HKEYS cart:user101

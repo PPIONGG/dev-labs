@@ -1,0 +1,35 @@
+services:
+  mongo:
+    image: mongo:7
+    command: mongod --replSet rs0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+      - ./exercises.js:/scripts/exercises.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "try { rs.status().ok } catch(e) { rs.initiate().ok }"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  mongo-init:
+    image: mongo:7
+    depends_on:
+      mongo:
+        condition: service_healthy
+    entrypoint: >
+      mongosh --host mongo --eval '
+        try {
+          rs.status();
+          print("Replica set already initialized");
+        } catch(e) {
+          rs.initiate({ _id: "rs0", members: [{ _id: 0, host: "mongo:27017" }] });
+          print("Replica set initialized");
+        }
+      '
+    restart: "no"
+
+volumes:
+  mongodata:

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 08 - Docker Compose</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 50px auto; text-align: center; }
+    h1 { color: #0db7ed; }
+    #result { margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Docker Compose Lab</h1>
+  <p>หน้าเว็บนี้ serve ด้วย nginx container</p>
+  <button onclick="fetchApi()">เรียก API</button>
+  <div id="result"></div>
+
+  <script>
+    async function fetchApi() {
+      try {
+        const res = await fetch('http://localhost:3000/');
+        const data = await res.json();
+        document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('result').textContent = 'Error: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
