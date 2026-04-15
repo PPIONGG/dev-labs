@@ -1,56 +1,42 @@
 import { Link } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
+import { FlaskConical } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ModeToggle } from '@/components/ModeToggle'
+import { UserMenu } from '@/components/UserMenu'
 import { useAuth } from '@/hooks/useAuth'
-import { Button, buttonVariants } from '@/components/ui/button'
 
 /**
- * Header แบบเรียบง่าย — logo + user menu
+ * Top navigation — logo + theme toggle + user menu / auth buttons
  */
 export function Header() {
-  const { user, loading, logout } = useAuth()
-
-  const handleLogout = async () => {
-    try {
-      await logout()
-    } catch (err) {
-      console.error('[logout]', err)
-    }
-  }
+  const { user, loading } = useAuth()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 font-semibold">
-          <span className="text-lg">🧪</span>
+        <Link
+          to="/"
+          className="flex items-center gap-2 font-semibold tracking-tight transition-opacity hover:opacity-80"
+        >
+          <FlaskConical className="h-5 w-5 text-primary" />
           <span>Dev Labs</span>
         </Link>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-2">
+          <ModeToggle />
           {loading ? (
-            <span className="text-sm text-muted-foreground">...</span>
+            <Skeleton className="h-9 w-9 rounded-full" />
           ) : user ? (
-            <>
-              <span className="hidden text-sm text-muted-foreground sm:inline">
-                {user.displayName ?? user.email}
-              </span>
-              <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="ออกจากระบบ">
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </>
+            <UserMenu />
           ) : (
             <>
-              <Link
-                to="/login"
-                className={buttonVariants({ variant: 'ghost', size: 'sm' })}
-              >
-                เข้าสู่ระบบ
-              </Link>
-              <Link
-                to="/register"
-                className={buttonVariants({ variant: 'outline', size: 'sm' })}
-              >
-                สมัครสมาชิก
-              </Link>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/login">เข้าสู่ระบบ</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/register">สมัครสมาชิก</Link>
+              </Button>
             </>
           )}
         </nav>

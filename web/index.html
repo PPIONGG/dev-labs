@@ -1,10 +1,28 @@
 <!doctype html>
-<html lang="en">
+<html lang="th">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web</title>
+    <meta name="theme-color" content="#ffffff" />
+    <title>Dev Labs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Apply theme before paint to avoid flash
+      ;(() => {
+        try {
+          const stored = localStorage.getItem("dev-labs-theme")
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+          const theme = stored ?? (prefersDark ? "dark" : "light")
+          if (theme === "dark") document.documentElement.classList.add("dark")
+        } catch {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

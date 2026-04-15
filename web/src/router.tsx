@@ -1,6 +1,8 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom'
+import { Toaster } from '@/components/ui/sonner'
 import { Header } from '@/components/Header'
 import { AuthProvider } from '@/hooks/useAuth'
+import { ThemeProvider } from '@/components/ThemeProvider'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
@@ -8,19 +10,22 @@ import StackComingSoon from '@/pages/StackComingSoon'
 import NotFound from '@/pages/NotFound'
 
 /**
- * Layout หลัก — wrap ด้วย AuthProvider ให้ทุก component ใน tree
- * แชร์ auth state เดียวกัน (Header + pages)
+ * App layout — wrap everything in ThemeProvider + AuthProvider
+ * Toaster ต้องอยู่ใน tree เดียวกันเพื่อเรียก toast() จาก components ได้
  */
 function RootLayout() {
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main>
-          <Outlet />
-        </main>
-      </div>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <div className="relative flex min-h-screen flex-col bg-background">
+          <Header />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+        </div>
+        <Toaster richColors position="top-right" />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

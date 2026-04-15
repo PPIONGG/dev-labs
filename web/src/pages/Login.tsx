@@ -1,20 +1,48 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { toast } from 'sonner'
+import { AlertCircle } from 'lucide-react'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { ApiError } from '@/lib/api'
 
-/**
- * หน้า Login — email + password
- * ถ้า login อยู่แล้ว → redirect ไป `?next=` หรือ `/`
- */
+const loginSchema = z.object({
+  email: z.string().min(1, 'กรุณากรอกอีเมล').email('อีเมลไม่ถูกต้อง'),
+  password: z.string().min(1, 'กรุณากรอกรหัสผ่าน'),
+})
+
+type LoginValues = z.infer<typeof loginSchema>
+
 export default function Login() {
   const { user, loading, login } = useAuth()
   const [searchParams] = useSearchParams()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [serverError, setServerError] = useState<string | null>(null)
+
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  })
 
   if (loading) {
     return (
@@ -29,87 +57,87 @@ export default function Login() {
     return <Navigate to={next} replace />
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setBusy(true)
-    setError(null)
+  async function onSubmit(values: LoginValues) {
+    setServerError(null)
     try {
-      await login(email, password)
-      // user state อัพเดต → Navigate ใน render จะจัดการ redirect
+      await login(values.email, values.password)
+      toast.success('เข้าสู่ระบบสำเร็จ')
     } catch (err) {
-      setBusy(false)
       if (err instanceof ApiError && err.code === 'INVALID_CREDENTIALS') {
-        setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
+        setServerError('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
       } else {
-        setError('เกิดข้อผิดพลาด ลองใหม่อีกครั้ง')
+        setServerError('เกิดข้อผิดพลาด ลองใหม่อีกครั้ง')
         console.error(err)
       }
     }
   }
 
   return (
-    <div className="flex min-h-[70vh] items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-card p-8 shadow-sm">
-        <div className="mb-6 text-center">
-          <div className="mb-3 text-4xl">🧪</div>
-          <h1 className="text-2xl font-semibold text-foreground">
-            เข้าสู่ Dev Labs
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            ใส่อีเมลและรหัสผ่านเพื่อเข้าสู่ระบบ
-          </p>
-        </div>
+    <div className="container flex min-h-[80vh] items-center justify-center px-4 py-10">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-2xl tracking-tight">เข้าสู่ Dev Labs</CardTitle>
+          <CardDescription>ใส่อีเมลและรหัสผ่านของคุณ</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {serverError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{serverError}</AlertDescription>
+            </Alert>
+          )}
 
-        {error && (
-          <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-            {error}
-          </div>
-        )}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>อีเมล</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        autoComplete="email"
+                        placeholder="name@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium">
-              อีเมล
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-            />
-          </div>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>รหัสผ่าน</FormLabel>
+                    <FormControl>
+                      <Input type="password" autoComplete="current-password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium">
-              รหัสผ่าน
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-            />
-          </div>
-
-          <Button type="submit" size="lg" className="w-full" disabled={busy}>
-            {busy ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
-          </Button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          ยังไม่มีบัญชี?{' '}
-          <Link to="/register" className="font-medium text-foreground hover:underline">
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="justify-center text-sm text-muted-foreground">
+          ยังไม่มีบัญชี?
+          <Link
+            to="/register"
+            className="ml-1 font-medium text-foreground underline-offset-4 hover:underline"
+          >
             สมัครสมาชิก
           </Link>
-        </p>
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

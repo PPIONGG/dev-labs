@@ -1,97 +1,133 @@
 import { Link } from 'react-router-dom'
-import { Container, Database, Flame, Leaf } from 'lucide-react'
+import { Container, Database, Flame, Leaf, ArrowRight } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 
-/**
- * หน้าแรก — hero + 4 stack cards (ทั้ง 4 stack page ยังเป็น placeholder)
- */
-const STACKS = [
+interface Stack {
+  slug: string
+  name: string
+  description: string
+  labCount: number
+  icon: LucideIcon
+  iconClass: string
+  iconBg: string
+}
+
+const STACKS: Stack[] = [
   {
     slug: 'docker',
     name: 'Docker',
-    description: 'Container, Compose, K8s — 19 labs',
+    description: 'Container, Compose, Kubernetes, CI/CD',
+    labCount: 19,
     icon: Container,
-    color: 'text-sky-600 dark:text-sky-400',
-    bg: 'bg-sky-50 dark:bg-sky-950/40',
+    iconClass: 'text-sky-600 dark:text-sky-400',
+    iconBg: 'bg-sky-500/10',
   },
   {
     slug: 'postgresql',
     name: 'PostgreSQL',
-    description: 'SQL, Indexing, Performance — 17 labs',
+    description: 'SQL, Indexing, Transactions, Performance',
+    labCount: 17,
     icon: Database,
-    color: 'text-indigo-600 dark:text-indigo-400',
-    bg: 'bg-indigo-50 dark:bg-indigo-950/40',
+    iconClass: 'text-indigo-600 dark:text-indigo-400',
+    iconBg: 'bg-indigo-500/10',
   },
   {
     slug: 'redis',
     name: 'Redis',
-    description: 'In-memory, Caching, Streams — 14 labs',
+    description: 'In-memory, Caching, Pub/Sub, Streams',
+    labCount: 14,
     icon: Flame,
-    color: 'text-rose-600 dark:text-rose-400',
-    bg: 'bg-rose-50 dark:bg-rose-950/40',
+    iconClass: 'text-rose-600 dark:text-rose-400',
+    iconBg: 'bg-rose-500/10',
   },
   {
     slug: 'mongodb',
     name: 'MongoDB',
-    description: 'NoSQL, Aggregation, Sharding — 15 labs',
+    description: 'NoSQL, Schema design, Aggregation',
+    labCount: 15,
     icon: Leaf,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+    iconClass: 'text-emerald-600 dark:text-emerald-400',
+    iconBg: 'bg-emerald-500/10',
   },
-] as const
+]
+
+const TOTAL_LABS = STACKS.reduce((sum, s) => sum + s.labCount, 0)
 
 export default function Home() {
   const { user } = useAuth()
   const greeting = user?.displayName ?? user?.email ?? null
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-12">
-      <section className="mb-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          Dev Labs
+    <div className="mx-auto max-w-6xl px-4 py-12 sm:py-20">
+      {/* Hero */}
+      <section className="mb-16 space-y-4 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          </span>
+          Online · {TOTAL_LABS} labs พร้อมเรียน
+        </div>
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          คลังฝึก Backend & DevOps
         </h1>
-        <p className="mt-3 text-lg text-muted-foreground">
-          คลังฝึกสำหรับ Backend & DevOps — 65 labs ครอบคลุม 4 stacks
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          เรียนรู้ Docker, PostgreSQL, Redis, MongoDB ผ่านโจทย์จริง —
+          เขียนโค้ด รัน container จริง ทำความคืบหน้าเก็บไว้ดูภายหลัง
         </p>
         {greeting && (
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             สวัสดี <span className="font-medium text-foreground">{greeting}</span> 👋
           </p>
         )}
       </section>
 
+      {/* Stack grid */}
       <section>
-        <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted-foreground">
+        <h2 className="mb-6 text-sm font-medium uppercase tracking-widest text-muted-foreground">
           เลือกหัวข้อที่สนใจ
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {STACKS.map((stack) => {
-            const Icon = stack.icon
-            return (
-              <Link
-                key={stack.slug}
-                to={`/${stack.slug}`}
-                className="group rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent/60 hover:bg-muted/50"
-              >
-                <div
-                  className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-md ${stack.bg}`}
-                >
-                  <Icon className={`h-5 w-5 ${stack.color}`} />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {stack.name}
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {stack.description}
-                </p>
-                <p className="mt-3 text-xs font-medium text-accent">
-                  เริ่มเรียน →
-                </p>
-              </Link>
-            )
-          })}
+          {STACKS.map((stack) => (
+            <StackCard key={stack.slug} stack={stack} />
+          ))}
         </div>
       </section>
     </div>
+  )
+}
+
+function StackCard({ stack }: { stack: Stack }) {
+  const Icon = stack.icon
+  return (
+    <Link to={`/${stack.slug}`} className="group focus:outline-none">
+      <Card className="h-full transition-all hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-md">
+        <CardHeader>
+          <div
+            className={`mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg ${stack.iconBg}`}
+          >
+            <Icon className={`h-5 w-5 ${stack.iconClass}`} />
+          </div>
+          <CardTitle className="flex items-center justify-between text-lg">
+            {stack.name}
+            <ArrowRight className="h-4 w-4 translate-x-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />
+          </CardTitle>
+          <CardDescription>{stack.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-xs font-medium text-muted-foreground">
+            {stack.labCount} labs
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   )
 }
