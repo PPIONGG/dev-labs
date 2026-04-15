@@ -446,7 +446,7 @@ function StackCard({ stack, labCount }: { stack: StackMeta; labCount: number }) 
   return (
     <Link
       to={`/${stack.slug}`}
-      className="group cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group cursor-pointer rounded-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       aria-label={`เริ่มเรียน ${stack.name} — ${labCount} labs`}
     >
       <SpotlightCard className="h-full">

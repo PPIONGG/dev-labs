@@ -189,7 +189,7 @@ export default function Profile() {
               <Link
                 key={s.slug}
                 to={`/${s.slug}`}
-                className="group cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="group cursor-pointer rounded-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <Card className="transition-colors hover:border-foreground/30">
                   <CardHeader className="flex-row items-start gap-4 space-y-0 pb-3">

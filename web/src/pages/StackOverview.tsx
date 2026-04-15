@@ -113,11 +113,11 @@ function StackOverviewInner({
               <Link
                 key={lab.slug}
                 to={`/${lab.slug}`}
-                className="group cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="group cursor-pointer rounded-xl focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 <Card
                   className={cn(
-                    'h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-sm',
+                    'h-full transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-xs',
                     completed && 'border-(--success)/40 bg-(--success)/5',
                   )}
                 >

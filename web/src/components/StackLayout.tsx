@@ -95,7 +95,7 @@ export function StackLayout({ currentStack, currentLabKey, children, toc }: Prop
       {drawerOpen && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true">
           <button
-            className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-foreground/40 backdrop-blur-xs"
             onClick={() => setDrawerOpen(false)}
             aria-label="ปิด drawer"
           />
