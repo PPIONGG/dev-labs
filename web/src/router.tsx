@@ -29,8 +29,15 @@ function RootLayout() {
         <AuthProvider>
           <ProgressProvider>
             <div className="relative flex min-h-screen flex-col bg-background">
+              {/* Skip-to-content — keyboard user กด Tab ครั้งแรกจะเจอลิงก์นี้ */}
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:font-medium focus:text-primary-foreground focus:shadow-md focus:outline-hidden focus:ring-2 focus:ring-ring"
+              >
+                ข้ามไปยังเนื้อหาหลัก
+              </a>
               <Header />
-              <main className="flex-1">
+              <main id="main-content" tabIndex={-1} className="flex-1">
                 <Outlet />
               </main>
               <Footer />

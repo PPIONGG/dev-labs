@@ -3,9 +3,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
+import { toast } from 'sonner'
 import { ApiError, progressApi } from '@/lib/api'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -39,19 +41,27 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth()
   const [done, setDone] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
+  // กัน toast ซ้ำซ้อนระหว่าง refresh ที่ fail ต่อเนื่อง (React StrictMode / network flap)
+  const hasShownSyncError = useRef(false)
 
   const refresh = useCallback(async () => {
     if (!user) {
       setDone(new Set())
+      hasShownSyncError.current = false
       return
     }
     setLoading(true)
     try {
       const { items } = await progressApi.list()
       setDone(new Set(items.map((i) => i.labSlug)))
+      hasShownSyncError.current = false
     } catch (err) {
       console.error('[progress.refresh]', err)
-      // เก็บ state เดิมไว้ ไม่ clear (เผื่อ network fail ชั่วคราว)
+      // เก็บ state เดิมไว้ ไม่ clear (เผื่อ network fail ชั่วคราว) + แจ้ง user ให้รู้ว่า sync fail
+      if (!hasShownSyncError.current) {
+        hasShownSyncError.current = true
+        toast.error('ดึงความคืบหน้าไม่สำเร็จ — ตรวจการเชื่อมต่ออินเทอร์เน็ต')
+      }
     } finally {
       setLoading(false)
     }
