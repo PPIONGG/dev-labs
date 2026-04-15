@@ -1,6 +1,7 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
 import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import { AuthProvider } from '@/hooks/useAuth'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Home from '@/pages/Home'
@@ -22,6 +23,7 @@ function RootLayout() {
           <main className="flex-1">
             <Outlet />
           </main>
+          <Footer />
         </div>
         <Toaster richColors position="top-right" />
       </AuthProvider>
