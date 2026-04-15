@@ -27,7 +27,7 @@ import { useContentIndex } from '@/hooks/useContent'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useInView } from '@/hooks/useInView'
 import { useCountUp } from '@/hooks/useCountUp'
-import { STACKS, TINT, type StackMeta, type StackSlug } from '@/lib/stacks'
+import { findStackMeta, TINT, type StackSlug } from '@/lib/stacks'
 import { cn } from '@/lib/utils'
 
 // -------------------- Section data --------------------
@@ -411,7 +411,8 @@ function OutcomeCard({
   item: StackOutcome
   labCount: number
 }) {
-  const meta = STACKS.find((s) => s.slug === item.slug) as StackMeta
+  const meta = findStackMeta(item.slug)
+  if (!meta) return null
   const Icon = meta.icon
   const tint = TINT[meta.tint]
   return (
@@ -477,9 +478,10 @@ function OutcomeCard({
 function CodeTabs({ tabs }: { tabs: CodeTab[] }) {
   const [activeSlug, setActiveSlug] = useState<StackSlug>(tabs[0].slug)
   const active = tabs.find((t) => t.slug === activeSlug) ?? tabs[0]
-  const meta = STACKS.find((s) => s.slug === active.slug) as StackMeta
-  const tint = TINT[meta.tint]
+  const activeMeta = findStackMeta(active.slug)
+  const tint = activeMeta ? TINT[activeMeta.tint] : TINT.sky
   const codeRef = useRef<HTMLElement | null>(null)
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   // Re-run syntax highlight เมื่อ tab เปลี่ยน
   // (ต้อง clear data-highlighted flag ของ hljs ก่อน ไม่งั้นไม่ highlight ซ้ำ)
@@ -489,6 +491,22 @@ function CodeTabs({ tabs }: { tabs: CodeTab[] }) {
     el.removeAttribute('data-highlighted')
     hljs.highlightElement(el)
   }, [activeSlug])
+
+  // Keyboard nav บน tablist ตาม WAI-ARIA: ←/→ ย้าย focus + active tab, Home/End ไปหัว/ท้าย
+  const handleTabKey = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const keys = ['ArrowLeft', 'ArrowRight', 'Home', 'End']
+    if (!keys.includes(e.key)) return
+    e.preventDefault()
+    const i = tabs.findIndex((t) => t.slug === activeSlug)
+    let next = i
+    if (e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length
+    if (e.key === 'ArrowRight') next = (i + 1) % tabs.length
+    if (e.key === 'Home') next = 0
+    if (e.key === 'End') next = tabs.length - 1
+    const nextSlug = tabs[next].slug
+    setActiveSlug(nextSlug)
+    tabRefs.current[nextSlug]?.focus()
+  }
 
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
@@ -500,20 +518,26 @@ function CodeTabs({ tabs }: { tabs: CodeTab[] }) {
       >
         {tabs.map((tab) => {
           const isActive = tab.slug === activeSlug
-          const tabMeta = STACKS.find((s) => s.slug === tab.slug) as StackMeta
+          const tabMeta = findStackMeta(tab.slug)
+          if (!tabMeta) return null
           const TabIcon = tabMeta.icon
           const tabTint = TINT[tabMeta.tint]
           return (
             <button
               key={tab.slug}
+              ref={(el) => {
+                tabRefs.current[tab.slug] = el
+              }}
               type="button"
               role="tab"
               aria-selected={isActive}
               aria-controls={`tabpanel-${tab.slug}`}
               id={`tab-${tab.slug}`}
+              tabIndex={isActive ? 0 : -1}
               onClick={() => setActiveSlug(tab.slug)}
+              onKeyDown={handleTabKey}
               className={cn(
-                'group relative flex shrink-0 cursor-pointer items-center gap-2 px-4 py-3 font-mono text-xs transition-colors',
+                'group relative flex shrink-0 cursor-pointer items-center gap-2 px-4 py-3 font-mono text-xs transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
                 isActive
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
