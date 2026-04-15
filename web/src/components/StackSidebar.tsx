@@ -6,8 +6,10 @@ import {
   Flame,
   Leaf,
   ChevronRight,
+  CheckCircle2,
   type LucideIcon,
 } from 'lucide-react'
+import { useProgress } from '@/components/ProgressProvider'
 import type { ContentIndex, StackSlug } from '@/lib/content'
 import { cn } from '@/lib/utils'
 
@@ -47,6 +49,8 @@ export function StackSidebar({
   currentLabKey,
   onNavigate,
 }: Props) {
+  const { isDone } = useProgress()
+
   // Track open state per stack — เริ่มต้น expand stack ปัจจุบัน
   const [openMap, setOpenMap] = useState<Record<string, boolean>>(() => {
     const map: Record<string, boolean> = {}
@@ -65,6 +69,7 @@ export function StackSidebar({
         const Icon = STACK_ICONS[stack.slug]
         const isOpen = openMap[stack.slug]
         const isCurrent = stack.slug === currentStack
+        const doneCount = stack.labs.filter((l) => isDone(l.slug)).length
 
         return (
           <div key={stack.slug} className="px-2">
@@ -96,7 +101,7 @@ export function StackSidebar({
                 {stack.slug}
               </span>
               <span className="ml-auto font-mono text-[10px] text-muted-foreground/70">
-                {stack.labs.length}
+                {doneCount > 0 ? `${doneCount}/${stack.labs.length}` : stack.labs.length}
               </span>
             </button>
 
@@ -105,6 +110,7 @@ export function StackSidebar({
               <ul id={`stack-${stack.slug}-labs`} className="mt-1 space-y-px pl-7">
                 {stack.labs.map((lab) => {
                   const isActive = isCurrent && lab.labKey === currentLabKey
+                  const completed = isDone(lab.slug)
                   return (
                     <li key={lab.slug}>
                       <NavLink
@@ -112,17 +118,27 @@ export function StackSidebar({
                         onClick={onNavigate}
                         className={({ isActive: navActive }) =>
                           cn(
-                            'block cursor-pointer rounded-md px-2 py-1.5 text-xs leading-snug transition-colors',
+                            'flex cursor-pointer items-start gap-2 rounded-md px-2 py-1.5 text-xs leading-snug transition-colors',
                             isActive || navActive
                               ? 'bg-muted font-medium text-foreground'
                               : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
                           )
                         }
                       >
-                        <span className="mr-2 font-mono text-[10px] tabular-nums text-muted-foreground/60">
-                          {String(lab.order).padStart(2, '0')}
-                        </span>
-                        {lab.title}
+                        {completed ? (
+                          <CheckCircle2
+                            className="mt-0.5 h-3 w-3 shrink-0 text-[--success]"
+                            aria-label="ทำเสร็จแล้ว"
+                          />
+                        ) : (
+                          <span
+                            className="mt-px font-mono text-[10px] tabular-nums text-muted-foreground/60"
+                            aria-hidden="true"
+                          >
+                            {String(lab.order).padStart(2, '0')}
+                          </span>
+                        )}
+                        <span className="min-w-0 flex-1">{lab.title}</span>
                       </NavLink>
                     </li>
                   )

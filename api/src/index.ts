@@ -4,6 +4,7 @@ import cors from 'cors'
 import { env } from './lib/env.js'
 import { attachUser } from './middleware/auth.js'
 import { authRouter } from './routes/auth.js'
+import { progressRouter } from './routes/progress.js'
 
 const app = express()
 
@@ -26,6 +27,7 @@ app.get('/health', (_req, res) => {
 })
 
 app.use('/auth', authRouter)
+app.use('/progress', progressRouter)
 
 // 404 fallback
 app.use((req, res) => {

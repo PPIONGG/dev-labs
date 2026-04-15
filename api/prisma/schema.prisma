@@ -12,12 +12,26 @@ datasource db {
 
 /// ผู้ใช้ — เก็บ email/password (hashed) + ข้อมูลโปรไฟล์
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  displayName  String?  @map("display_name")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id           String        @id @default(cuid())
+  email        String        @unique
+  passwordHash String        @map("password_hash")
+  displayName  String?       @map("display_name")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  progress     LabProgress[]
 
   @@map("users")
+}
+
+/// ความคืบหน้าการเรียน — บันทึกว่า user ไหนทำ lab ไหนเสร็จเมื่อไหร่
+/// labSlug รูปแบบ "<stack>/<lab-folder>" เช่น "docker/lab-01-what-is-docker"
+model LabProgress {
+  userId      String   @map("user_id")
+  labSlug     String   @map("lab_slug")
+  completedAt DateTime @default(now()) @map("completed_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, labSlug])
+  @@index([userId])
+  @@map("lab_progress")
 }

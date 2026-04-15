@@ -57,6 +57,29 @@ async function apiFetch<T = unknown>(
   return body as T
 }
 
+// -------------------- Progress API --------------------
+
+export interface ProgressItem {
+  labSlug: string
+  completedAt: string
+}
+
+export const progressApi = {
+  list: () => apiFetch<{ items: ProgressItem[] }>('/progress'),
+
+  mark: (labSlug: string) =>
+    apiFetch<{ item: ProgressItem }>('/progress', {
+      method: 'POST',
+      body: JSON.stringify({ labSlug }),
+    }),
+
+  /** unmark — labSlug = "<stack>/<labKey>" — เราส่ง path ตามแยก segment */
+  unmark: (labSlug: string) =>
+    apiFetch<{ ok: true }>(`/progress/${labSlug}`, {
+      method: 'DELETE',
+    }),
+}
+
 // -------------------- Auth API --------------------
 
 export const authApi = {

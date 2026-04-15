@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, CheckCircle2, Hash, Loader2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Hash, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -9,6 +9,7 @@ import { StackLayout } from '@/components/StackLayout'
 import { useContentIndex, useLabMarkdown } from '@/hooks/useContent'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useAuth } from '@/hooks/useAuth'
+import { useProgress } from '@/components/ProgressProvider'
 import { findLab, findSiblings, type StackSlug } from '@/lib/content'
 import { cn } from '@/lib/utils'
 
@@ -270,16 +271,31 @@ function TocPanel({ markdown }: { markdown: string }) {
 
 function MarkAsDoneButton({ labSlug }: { labSlug: string }) {
   const { user } = useAuth()
-  const [done, setDone] = useState(false) // local-only ตอนนี้
+  const { isDone, markDone, markUndone } = useProgress()
+  const [busy, setBusy] = useState(false)
+  const done = isDone(labSlug)
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (!user) {
       toast.info('เข้าสู่ระบบเพื่อบันทึกความคืบหน้า')
       return
     }
-    // TODO: เรียก API /api/progress (slice ถัดไป)
-    setDone((v) => !v)
-    toast.success(done ? 'ยกเลิกการทำเครื่องหมาย' : `ทำเครื่องหมาย ${labSlug} เสร็จแล้ว`)
+    if (busy) return
+    setBusy(true)
+    try {
+      if (done) {
+        await markUndone(labSlug)
+        toast.success('ยกเลิกการทำเครื่องหมายแล้ว')
+      } else {
+        await markDone(labSlug)
+        toast.success('บันทึกความคืบหน้าแล้ว')
+      }
+    } catch (err) {
+      console.error('[markAsDone]', err)
+      toast.error('บันทึกไม่สำเร็จ ลองอีกครั้ง')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -287,12 +303,15 @@ function MarkAsDoneButton({ labSlug }: { labSlug: string }) {
       variant={done ? 'default' : 'outline'}
       size="sm"
       onClick={handleClick}
+      disabled={busy}
       className="cursor-pointer"
     >
-      {done ? (
+      {busy ? (
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+      ) : done ? (
         <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
       ) : (
-        <Loader2 className="h-4 w-4" aria-hidden="true" />
+        <Circle className="h-4 w-4" aria-hidden="true" />
       )}
       {done ? 'ทำเสร็จแล้ว' : 'Mark as Done'}
     </Button>

@@ -5,6 +5,7 @@ import { Footer } from '@/components/Footer'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { AuthProvider } from '@/hooks/useAuth'
+import { ProgressProvider } from '@/components/ProgressProvider'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
@@ -26,14 +27,16 @@ function RootLayout() {
     <ErrorBoundary>
       <ThemeProvider>
         <AuthProvider>
-          <div className="relative flex min-h-screen flex-col bg-background">
-            <Header />
-            <main className="flex-1">
-              <Outlet />
-            </main>
-            <Footer />
-          </div>
-          <Toaster richColors position="top-right" />
+          <ProgressProvider>
+            <div className="relative flex min-h-screen flex-col bg-background">
+              <Header />
+              <main className="flex-1">
+                <Outlet />
+              </main>
+              <Footer />
+            </div>
+            <Toaster richColors position="top-right" />
+          </ProgressProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

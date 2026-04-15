@@ -28,6 +28,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useProgress } from '@/components/ProgressProvider'
+import { useContentIndex } from '@/hooks/useContent'
 
 interface StackProgress {
   slug: string
@@ -39,45 +41,32 @@ interface StackProgress {
   iconBg: string
 }
 
-// Placeholder progress — จะเชื่อมต่อกับ /api/progress ใน slice ถัดไป
-const STACK_PROGRESS: StackProgress[] = [
-  {
-    slug: 'docker',
-    name: 'Docker',
+/** Static metadata per stack (icon + colors) — รวมกับ progress runtime */
+const STACK_META: Record<
+  string,
+  { icon: LucideIcon; iconClass: string; iconBg: string }
+> = {
+  docker: {
     icon: Container,
-    total: 19,
-    done: 0,
     iconClass: 'text-sky-600 dark:text-sky-400',
     iconBg: 'bg-sky-500/10',
   },
-  {
-    slug: 'postgresql',
-    name: 'PostgreSQL',
+  postgresql: {
     icon: Database,
-    total: 17,
-    done: 0,
     iconClass: 'text-indigo-600 dark:text-indigo-400',
     iconBg: 'bg-indigo-500/10',
   },
-  {
-    slug: 'redis',
-    name: 'Redis',
+  redis: {
     icon: Flame,
-    total: 14,
-    done: 0,
     iconClass: 'text-rose-600 dark:text-rose-400',
     iconBg: 'bg-rose-500/10',
   },
-  {
-    slug: 'mongodb',
-    name: 'MongoDB',
+  mongodb: {
     icon: Leaf,
-    total: 15,
-    done: 0,
     iconClass: 'text-emerald-600 dark:text-emerald-400',
     iconBg: 'bg-emerald-500/10',
   },
-]
+}
 
 function initials(name: string | null, email: string) {
   if (name) {
@@ -106,11 +95,27 @@ function formatJoinedDate(iso: string) {
 export default function Profile() {
   useDocumentTitle('โปรไฟล์ · Dev Labs')
   const { user, logout } = useAuth()
+  const { isDone } = useProgress()
+  const { data: contentIndex } = useContentIndex()
 
   if (!user) return null // ProtectedRoute จะ redirect ไปก่อนถึงตรงนี้
 
-  const totalLabs = STACK_PROGRESS.reduce((sum, s) => sum + s.total, 0)
-  const totalDone = STACK_PROGRESS.reduce((sum, s) => sum + s.done, 0)
+  // Derive progress per stack จาก content index + done set
+  const stackProgress: StackProgress[] = (contentIndex?.stacks ?? []).map((s) => {
+    const meta = STACK_META[s.slug] ?? STACK_META.docker
+    return {
+      slug: s.slug,
+      name: s.name,
+      icon: meta.icon,
+      iconClass: meta.iconClass,
+      iconBg: meta.iconBg,
+      total: s.labs.length,
+      done: s.labs.filter((l) => isDone(l.slug)).length,
+    }
+  })
+
+  const totalLabs = stackProgress.reduce((sum, s) => sum + s.total, 0)
+  const totalDone = stackProgress.reduce((sum, s) => sum + s.done, 0)
   const overallPct = totalLabs > 0 ? Math.round((totalDone / totalLabs) * 100) : 0
 
   const handleLogout = async () => {
@@ -204,12 +209,9 @@ export default function Profile() {
           <h2 className="mt-1 font-display text-xl font-bold tracking-tight">
             ความคืบหน้าแยกตาม stack
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            * ตอนนี้ progress tracking ยังไม่เปิดใช้ — จะเชื่อม API ใน slice ถัดไป
-          </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          {STACK_PROGRESS.map((s) => {
+          {stackProgress.map((s) => {
             const Icon = s.icon
             const pct = s.total > 0 ? Math.round((s.done / s.total) * 100) : 0
             return (
