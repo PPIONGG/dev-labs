@@ -16,7 +16,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-[--color-muted-foreground]">
+      <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">
         กำลังตรวจสอบสถานะผู้ใช้...
       </div>
     )

@@ -47,21 +47,21 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <section className="mb-12 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-[--color-foreground] sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Dev Labs
         </h1>
-        <p className="mt-3 text-lg text-[--color-muted-foreground]">
+        <p className="mt-3 text-lg text-muted-foreground">
           คลังฝึกสำหรับ Backend & DevOps — 65 labs ครอบคลุม 4 stacks
         </p>
         {greeting && (
-          <p className="mt-4 text-sm text-[--color-muted-foreground]">
-            สวัสดี <span className="font-medium text-[--color-foreground]">{greeting}</span> 👋
+          <p className="mt-4 text-sm text-muted-foreground">
+            สวัสดี <span className="font-medium text-foreground">{greeting}</span> 👋
           </p>
         )}
       </section>
 
       <section>
-        <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-[--color-muted-foreground]">
+        <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-muted-foreground">
           เลือกหัวข้อที่สนใจ
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -71,20 +71,20 @@ export default function Home() {
               <Link
                 key={stack.slug}
                 to={`/${stack.slug}`}
-                className="group rounded-lg border border-[--color-border] bg-[--color-card] p-5 transition-colors hover:border-[--color-accent]/60 hover:bg-[--color-muted]/50"
+                className="group rounded-lg border border-border bg-card p-5 transition-colors hover:border-accent/60 hover:bg-muted/50"
               >
                 <div
                   className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-md ${stack.bg}`}
                 >
                   <Icon className={`h-5 w-5 ${stack.color}`} />
                 </div>
-                <h3 className="text-lg font-semibold text-[--color-foreground]">
+                <h3 className="text-lg font-semibold text-foreground">
                   {stack.name}
                 </h3>
-                <p className="mt-1 text-sm text-[--color-muted-foreground]">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {stack.description}
                 </p>
-                <p className="mt-3 text-xs font-medium text-[--color-accent]">
+                <p className="mt-3 text-xs font-medium text-accent">
                   เริ่มเรียน →
                 </p>
               </Link>

@@ -18,7 +18,7 @@ export default function Register() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-[--color-muted-foreground]">
+      <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">
         กำลังโหลด...
       </div>
     )
@@ -53,13 +53,13 @@ export default function Register() {
 
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-4">
-      <div className="w-full max-w-sm rounded-lg border border-[--color-border] bg-[--color-card] p-8 shadow-sm">
+      <div className="w-full max-w-sm rounded-lg border border-border bg-card p-8 shadow-sm">
         <div className="mb-6 text-center">
           <div className="mb-3 text-4xl">🧪</div>
-          <h1 className="text-2xl font-semibold text-[--color-foreground]">
+          <h1 className="text-2xl font-semibold text-foreground">
             สร้างบัญชีใหม่
           </h1>
-          <p className="mt-2 text-sm text-[--color-muted-foreground]">
+          <p className="mt-2 text-sm text-muted-foreground">
             ใช้ฟรี บันทึกความคืบหน้าและโน้ตส่วนตัวได้
           </p>
         </div>
@@ -73,7 +73,7 @@ export default function Register() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="displayName" className="mb-1 block text-sm font-medium">
-              ชื่อที่แสดง <span className="text-[--color-muted-foreground]">(ไม่บังคับ)</span>
+              ชื่อที่แสดง <span className="text-muted-foreground">(ไม่บังคับ)</span>
             </label>
             <input
               id="displayName"
@@ -82,7 +82,7 @@ export default function Register() {
               maxLength={100}
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full rounded-md border border-[--color-border] bg-[--color-background] px-3 py-2 text-sm outline-none focus:border-[--color-accent] focus:ring-1 focus:ring-[--color-accent]"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
             />
           </div>
 
@@ -97,13 +97,13 @@ export default function Register() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-[--color-border] bg-[--color-background] px-3 py-2 text-sm outline-none focus:border-[--color-accent] focus:ring-1 focus:ring-[--color-accent]"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
             />
           </div>
 
           <div>
             <label htmlFor="password" className="mb-1 block text-sm font-medium">
-              รหัสผ่าน <span className="text-[--color-muted-foreground]">(อย่างน้อย 8 ตัว)</span>
+              รหัสผ่าน <span className="text-muted-foreground">(อย่างน้อย 8 ตัว)</span>
             </label>
             <input
               id="password"
@@ -113,7 +113,7 @@ export default function Register() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-[--color-border] bg-[--color-background] px-3 py-2 text-sm outline-none focus:border-[--color-accent] focus:ring-1 focus:ring-[--color-accent]"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
             />
           </div>
 
@@ -122,9 +122,9 @@ export default function Register() {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[--color-muted-foreground]">
+        <p className="mt-6 text-center text-sm text-muted-foreground">
           มีบัญชีอยู่แล้ว?{' '}
-          <Link to="/login" className="font-medium text-[--color-foreground] hover:underline">
+          <Link to="/login" className="font-medium text-foreground hover:underline">
             เข้าสู่ระบบ
           </Link>
         </p>

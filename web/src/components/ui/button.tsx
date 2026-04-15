@@ -4,22 +4,20 @@ import { cn } from '@/lib/utils'
 
 /**
  * Button component ตามสไตล์ shadcn/ui — variant + size ผ่าน cva
- * ใช้ `asChild` ไม่ได้ในเวอร์ชันนี้ (ถ้าต้องการภายหลังเพิ่ม @radix-ui/react-slot)
  */
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent] disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default:
-          'bg-[--color-primary] text-[--color-primary-foreground] hover:bg-[--color-primary]/90',
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         outline:
-          'border border-[--color-border] bg-[--color-background] hover:bg-[--color-muted]',
+          'border border-border bg-background hover:bg-muted text-foreground',
         secondary:
-          'bg-[--color-secondary] text-[--color-secondary-foreground] hover:bg-[--color-secondary]/80',
-        ghost: 'hover:bg-[--color-muted]',
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-muted text-foreground',
         destructive:
-          'bg-[--color-destructive] text-[--color-destructive-foreground] hover:bg-[--color-destructive]/90',
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
       },
       size: {
         sm: 'h-8 px-3',

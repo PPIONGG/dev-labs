@@ -18,7 +18,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[--color-border] bg-[--color-background]/80 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2 font-semibold">
           <span className="text-lg">🧪</span>
@@ -27,10 +27,10 @@ export function Header() {
 
         <nav className="flex items-center gap-3">
           {loading ? (
-            <span className="text-sm text-[--color-muted-foreground]">...</span>
+            <span className="text-sm text-muted-foreground">...</span>
           ) : user ? (
             <>
-              <span className="hidden text-sm text-[--color-muted-foreground] sm:inline">
+              <span className="hidden text-sm text-muted-foreground sm:inline">
                 {user.displayName ?? user.email}
               </span>
               <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="ออกจากระบบ">
