@@ -8,3 +8,7 @@ dist/
 
 # Claude Code personal settings (don't share)
 .claude/settings.local.json
+
+# Python cache (skill scripts)
+__pycache__/
+*.pyc
