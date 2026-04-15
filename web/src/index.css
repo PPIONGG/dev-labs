@@ -13,8 +13,11 @@
     "Segoe UI", Roboto, sans-serif;
   --font-mono:
     "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  /* Display — ใช้ IBM Plex Sans Thai Looped เป็นหลัก (มีทั้ง TH + EN)
+     แล้ว fallback ไป IBM Plex Sans สำหรับ character ที่ไม่รองรับ */
   --font-display:
-    "JetBrains Mono", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    "IBM Plex Sans Thai Looped", "IBM Plex Sans", ui-sans-serif, system-ui,
+    sans-serif;
 }
 
 @theme inline {

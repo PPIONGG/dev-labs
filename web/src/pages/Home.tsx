@@ -322,7 +322,7 @@ function HeroSection({
           </span>
         </div>
 
-        <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tighter sm:text-5xl lg:text-6xl">
+        <h1 className="font-display text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
           ฝึก dev skills
           <br />
           <span className="bg-gradient-to-br from-foreground to-foreground/50 bg-clip-text text-transparent">
