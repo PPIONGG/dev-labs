@@ -34,9 +34,9 @@ export function StackLayout({ currentStack, currentLabKey, children, toc }: Prop
 
   return (
     <div className="mx-auto flex w-full max-w-7xl gap-0">
-      {/* Sidebar — desktop sticky */}
+      {/* Sidebar — desktop sticky (self-start ป้องกัน flex stretch ไม่ให้ sticky พัง) */}
       <aside
-        className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r border-border/60 bg-background/40 lg:block"
+        className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 self-start overflow-y-auto border-r border-border/60 bg-background/40 lg:block"
         aria-label="Sidebar navigation"
       >
         {loading ? (
@@ -107,10 +107,10 @@ export function StackLayout({ currentStack, currentLabKey, children, toc }: Prop
           {children}
         </div>
 
-        {/* TOC — desktop xl+ only */}
+        {/* TOC — desktop xl+ only (self-start ป้องกัน flex stretch) */}
         {toc && (
           <aside
-            className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 overflow-y-auto py-8 pr-6 xl:block"
+            className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-56 shrink-0 self-start overflow-y-auto py-8 pr-6 xl:block"
             aria-label="Table of contents"
           >
             {toc}
