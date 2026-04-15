@@ -54,28 +54,32 @@ export default function LabDetail() {
   const { stack: stackParam = '', labKey = '' } = useParams()
   const { data: index, loading: indexLoading } = useContentIndex()
 
-  if (!isStackSlug(stackParam)) {
-    return <Navigate to="/404" replace />
-  }
-
-  const lab = index ? findLab(index, stackParam, labKey) : null
+  // Hooks ต้องเรียกก่อน early return เสมอ — เลยเก็บ validity ไว้เป็นตัวแปรแล้ว redirect ทีหลัง
+  const validStack = isStackSlug(stackParam) ? stackParam : null
+  const lab = index && validStack ? findLab(index, validStack, labKey) : null
   const siblings = useMemo(
-    () => (index ? findSiblings(index, stackParam, labKey) : { prev: null, next: null }),
-    [index, stackParam, labKey],
+    () =>
+      index && validStack
+        ? findSiblings(index, validStack, labKey)
+        : { prev: null, next: null },
+    [index, validStack, labKey],
   )
-
   const { data: markdown, loading: mdLoading, error: mdError } = useLabMarkdown(
     lab?.path,
   )
 
+  if (!validStack) {
+    return <Navigate to="/404" replace />
+  }
+
   return (
     <StackLayout
-      currentStack={stackParam}
+      currentStack={validStack}
       currentLabKey={labKey}
       toc={markdown ? <TocPanel markdown={markdown} /> : null}
     >
       <LabDetailInner
-        stack={stackParam}
+        stack={validStack}
         labKey={labKey}
         lab={lab}
         markdown={markdown}

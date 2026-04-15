@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { FlaskConical, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -23,13 +23,7 @@ const NAV_LINKS = [
  */
 export function Header() {
   const { user, loading } = useAuth()
-  const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
-
-  // Close mobile menu when route changes
-  if (mobileOpen && location.pathname) {
-    // intentional — handled by useEffect-less pattern via click handler on links
-  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
