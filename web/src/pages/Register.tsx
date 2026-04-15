@@ -85,7 +85,12 @@ export default function Register() {
     <div className="container flex min-h-[80vh] items-center justify-center px-4 py-10">
       <Card className="w-full max-w-sm">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl tracking-tight">สร้างบัญชีใหม่</CardTitle>
+          <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            // sign up
+          </div>
+          <CardTitle className="font-display text-2xl tracking-tight">
+            สร้างบัญชีใหม่
+          </CardTitle>
           <CardDescription>ใช้ฟรี บันทึกความคืบหน้าและโน้ตส่วนตัว</CardDescription>
         </CardHeader>
         <CardContent>
@@ -147,7 +152,11 @@ export default function Register() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={form.formState.isSubmitting}
+              >
                 {form.formState.isSubmitting ? 'กำลังสมัคร...' : 'สมัครสมาชิก'}
               </Button>
             </form>

@@ -76,7 +76,12 @@ export default function Login() {
     <div className="container flex min-h-[80vh] items-center justify-center px-4 py-10">
       <Card className="w-full max-w-sm">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl tracking-tight">เข้าสู่ Dev Labs</CardTitle>
+          <div className="mb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+            // sign in
+          </div>
+          <CardTitle className="font-display text-2xl tracking-tight">
+            เข้าสู่ Dev Labs
+          </CardTitle>
           <CardDescription>ใส่อีเมลและรหัสผ่านของคุณ</CardDescription>
         </CardHeader>
         <CardContent>
@@ -122,7 +127,11 @@ export default function Login() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                className="w-full cursor-pointer"
+                disabled={form.formState.isSubmitting}
+              >
                 {form.formState.isSubmitting ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
               </Button>
             </form>

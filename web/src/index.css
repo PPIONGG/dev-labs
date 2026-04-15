@@ -3,12 +3,18 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* -------------------------------------------------------------------------- */
+/*  Typography & base tokens — Swiss minimal + developer mono headings        */
+/* -------------------------------------------------------------------------- */
+
 @theme {
   --font-sans:
-    "Inter", "Noto Sans Thai", ui-sans-serif, system-ui, -apple-system,
+    "IBM Plex Sans", "IBM Plex Thai", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
   --font-mono:
     "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display:
+    "JetBrains Mono", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {
@@ -31,73 +37,176 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Light mode — Swiss: white + slate-900 text + green CTA                    */
+/* -------------------------------------------------------------------------- */
+
 :root {
-  --radius: 0.625rem;
+  --radius: 0.5rem;
+
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --foreground: oklch(0.15 0.02 250); /* slate-900 */
+
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.15 0.02 250);
+
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.15 0.02 250);
+
+  /* Primary = near-black (Swiss brand) */
+  --primary: oklch(0.2 0.015 250);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+
+  --secondary: oklch(0.96 0.005 250); /* slate-100 */
+  --secondary-foreground: oklch(0.2 0.015 250);
+
+  --muted: oklch(0.97 0.003 250); /* slate-50 */
+  --muted-foreground: oklch(0.45 0.015 250); /* slate-500 for readable muted */
+
+  --accent: oklch(0.96 0.005 250);
+  --accent-foreground: oklch(0.2 0.015 250);
+
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+
+  /* Success green — our CTA / "run" accent */
+  --success: oklch(0.7 0.18 150); /* green-500 */
+  --success-foreground: oklch(0.985 0 0);
+
+  --border: oklch(0.92 0.005 250);
+  --input: oklch(0.92 0.005 250);
+  --ring: oklch(0.55 0.02 250); /* mid slate for visible focus */
 }
 
+/* -------------------------------------------------------------------------- */
+/*  Dark mode — slate-950 bg + lighter text + brighter green                  */
+/* -------------------------------------------------------------------------- */
+
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --background: oklch(0.12 0.015 250); /* slate-950 */
+  --foreground: oklch(0.97 0.005 250);
+
+  --card: oklch(0.16 0.015 250); /* slate-900 */
+  --card-foreground: oklch(0.97 0.005 250);
+
+  --popover: oklch(0.16 0.015 250);
+  --popover-foreground: oklch(0.97 0.005 250);
+
+  --primary: oklch(0.97 0.005 250);
+  --primary-foreground: oklch(0.15 0.02 250);
+
+  --secondary: oklch(0.22 0.015 250); /* slate-800 */
+  --secondary-foreground: oklch(0.97 0.005 250);
+
+  --muted: oklch(0.2 0.015 250);
+  --muted-foreground: oklch(0.68 0.01 250); /* slate-400 */
+
+  --accent: oklch(0.22 0.015 250);
+  --accent-foreground: oklch(0.97 0.005 250);
+
+  --destructive: oklch(0.7 0.19 22);
   --destructive-foreground: oklch(0.985 0 0);
+
+  --success: oklch(0.76 0.17 150); /* brighter green for dark */
+  --success-foreground: oklch(0.12 0.015 250);
+
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.65 0.02 250);
 }
+
+/* -------------------------------------------------------------------------- */
+/*  Base layer                                                                */
+/* -------------------------------------------------------------------------- */
 
 @layer base {
   * {
     border-color: var(--color-border);
   }
+
   html,
   body,
   #root {
     height: 100%;
   }
+
+  html {
+    /* Scrollbar gutter stable to prevent layout jump when dropdown opens */
+    scrollbar-gutter: stable;
+  }
+
   body {
     margin: 0;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    line-height: 1.6;
+  }
+
+  /* Swiss-inspired: tight tracking on display type */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    font-feature-settings: "ss01" 1, "cv11" 1;
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+  }
+
+  /* Readable paragraph line length */
+  p {
+    max-width: 75ch;
+  }
+
+  /* Accessibility: respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Utility tweaks                                                            */
+/* -------------------------------------------------------------------------- */
+
+@layer utilities {
+  /* Grid background for hero decoration */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Subtle glow for CTA */
+  .glow-success {
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-success) 30%, transparent),
+      0 4px 24px -4px color-mix(in oklab, var(--color-success) 35%, transparent);
   }
 }

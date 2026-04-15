@@ -7,23 +7,26 @@ import { UserMenu } from '@/components/UserMenu'
 import { useAuth } from '@/hooks/useAuth'
 
 /**
- * Top navigation — logo + theme toggle + user menu / auth buttons
+ * Top navigation — Swiss minimal: mono brand + compact controls
  */
 export function Header() {
   const { user, loading } = useAuth()
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/70 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Link
           to="/"
-          className="flex items-center gap-2 font-semibold tracking-tight transition-opacity hover:opacity-80"
+          className="group flex cursor-pointer items-center gap-2 font-display text-[15px] font-semibold tracking-tight transition-colors hover:text-foreground/80"
         >
-          <FlaskConical className="h-5 w-5 text-primary" />
-          <span>Dev Labs</span>
+          <FlaskConical
+            className="h-4 w-4 text-[--success] transition-transform duration-200 group-hover:rotate-12"
+            aria-hidden="true"
+          />
+          <span>dev-labs</span>
         </Link>
 
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-2" aria-label="User navigation">
           <ModeToggle />
           {loading ? (
             <Skeleton className="h-9 w-9 rounded-full" />
@@ -31,10 +34,10 @@ export function Header() {
             <UserMenu />
           ) : (
             <>
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" asChild className="cursor-pointer">
                 <Link to="/login">เข้าสู่ระบบ</Link>
               </Button>
-              <Button size="sm" asChild>
+              <Button size="sm" asChild className="cursor-pointer">
                 <Link to="/register">สมัครสมาชิก</Link>
               </Button>
             </>
