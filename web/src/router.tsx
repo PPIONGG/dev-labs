@@ -10,7 +10,8 @@ import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Profile from '@/pages/Profile'
-import StackComingSoon from '@/pages/StackComingSoon'
+import StackOverview from '@/pages/StackOverview'
+import LabDetail from '@/pages/LabDetail'
 import NotFound from '@/pages/NotFound'
 
 /**
@@ -54,7 +55,8 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      { path: '/:stack', element: <StackComingSoon /> },
+      { path: '/:stack', element: <StackOverview /> },
+      { path: '/:stack/:labKey', element: <LabDetail /> },
       { path: '*', element: <NotFound /> },
     ],
   },
